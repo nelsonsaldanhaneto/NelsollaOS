@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tinytosh PC</title>
+    <title>NelsollaOS PC</title>
     <link rel="stylesheet" href="styles.css" />
     <script type="module" src="/main.js" defer></script>
   </head>
@@ -11,7 +11,7 @@
   <body>
     <div class="container">
       
-      <div class="app-header">Tinytosh PC</div>
+      <div class="app-header">NelsollaOS PC</div>
 
       <div class="panel header-panel">
         <div id="time-display">--:--</div>
@@ -20,48 +20,48 @@
         <div id="greetings-text" class="greetings-text"></div>
         
         <div class="identity-box">
-          <div id="device-id-text" class="id-text">Loading...</div>
-          <div id="device-ip-text" class="ip-text">TINYTOSH IP: --</div>
-          <div id="tinytosh-link-status" class="status-badge">NOT CONNECTED</div>
+          <div id="device-id-text" class="id-text">Carregando...</div>
+          <div id="device-ip-text" class="ip-text">IP DO NELSOLLAOS: --</div>
+          <div id="tinytosh-link-status" class="status-badge">NÃO CONECTADO</div>
         </div>
       </div>
       
       <div class="panel">
-        <label for="port-select" class="section-label mt-0">TARGET DEVICE</label>
-        <select id="port-select"><option value="">Scanning...</option></select>
+        <label for="port-select" class="section-label mt-0">DISPOSITIVO ALVO</label>
+        <select id="port-select"><option value="">Procurando...</option></select>
         
         <div class="checkbox-wrapper">
           <input type="checkbox" id="autostart-cb">
-          <label for="autostart-cb" class="mt-0">Start on Boot</label>
+          <label for="autostart-cb" class="mt-0">Iniciar com o Sistema</label>
         </div>
         
-        <button id="conn-btn" class="btn-secondary">Connect</button>
-        <p id="status-text" class="status-badge mt-25">Waiting for connection...</p>
+        <button id="conn-btn" class="btn-secondary">Conectar</button>
+        <p id="status-text" class="status-badge mt-25">Aguardando conexão...</p>
       </div>
 
       <div class="panel hidden" id="logs-panel">
         <div class="panel-header-flex">
-          <h3 class="panel-title">USB Device Logs</h3>
+          <h3 class="panel-title">Logs do Dispositivo USB</h3>
           <div class="panel-header-actions">
-            <button type="button" id="toggle-logs-btn" class="btn-secondary btn-small">START</button>
-            <button type="button" id="clear-logs-btn" class="btn-secondary btn-small">CLEAR</button>
+            <button type="button" id="toggle-logs-btn" class="btn-secondary btn-small">INICIAR</button>
+            <button type="button" id="clear-logs-btn" class="btn-secondary btn-small">LIMPAR</button>
           </div>
         </div>
         <div id="log-container" class="log-container hidden"></div>
       </div>
 
       <div class="panel">
-        <h3 class="panel-title">Now Playing</h3>
+        <h3 class="panel-title">Tocando Agora</h3>
         <div class="identity-box" style="margin-top: 10px;">
-          <div id="media-status" class="status-badge" style="margin-bottom: 5px; color: var(--text-muted);">STOPPED</div>
-          <div id="media-name" class="id-text" style="font-size: 1.3rem;">No Media</div>
+          <div id="media-status" class="status-badge" style="margin-bottom: 5px; color: var(--text-muted);">PARADO</div>
+          <div id="media-name" class="id-text" style="font-size: 1.3rem;">Sem Mídia</div>
           <div id="media-author" class="ip-text hidden"></div>
           <div id="media-album" class="tile-label hidden"></div>
         </div>
       </div>
 
       <div class="panel">
-        <h3 class="panel-title">Local PC Telemetry</h3>
+        <h3 class="panel-title">Telemetria Local do PC</h3>
         <div class="dashboard-grid">
           <div class="telemetry-tile">
             <div class="tile-value" id="cpu">--%</div>
@@ -73,343 +73,343 @@
           </div>
           <div class="telemetry-tile">
             <div class="tile-value" id="disk">--%</div>
-            <div class="tile-label">Disk</div>
+            <div class="tile-label">Disco</div>
           </div>
           <div class="telemetry-tile">
             <div class="tile-value">
                 <span id="dl-val">--</span>
                 <span id="dl-unit" style="font-size: 0.75rem; color: var(--text-muted);">KB/s</span>
             </div>
-            <div class="tile-label">Net</div>
+            <div class="tile-label">Rede</div>
           </div>
         </div>
       </div>
 
       <form id="settings-form">
         <div id="config-placeholder" class="no-data-tile mt-0" style="margin-bottom: 25px;">
-          Device configuration will be displayed after connection is established.
+          As configurações do dispositivo aparecem após a conexão ser estabelecida.
         </div>
 
         <div id="config-wrapper" class="hidden">
           
           <div class="panel">
-            <h3 class="panel-title">Hardware Setup</h3>
+            <h3 class="panel-title">Configuração de Hardware</h3>
             <div class="dashboard-grid mt-0">
               <div>
-                <label class="mt-0">I2C SDA Pin:</label>
+                <label class="mt-0">Pino I2C SDA:</label>
                 <select name="sda_pin" class="hw-pin"></select>
               </div>
               <div>
-                <label class="mt-0">I2C SCL Pin:</label>
+                <label class="mt-0">Pino I2C SCL:</label>
                 <select name="scl_pin" class="hw-pin"></select>
               </div>
             </div>
-            <label class="mt-0">Touch Sensor GPIO Pin:</label>
+            <label class="mt-0">Pino GPIO do Sensor de Toque:</label>
             <select name="touch_pin" class="hw-pin"></select>
-            <p class="help-text mt-0">Reboot Tinytosh to apply any hardware pin changes.</p>
+            <p class="help-text mt-0">Reinicie o NelsollaOS para aplicar mudanças nos pinos.</p>
           </div>
 
           <div class="panel">
-            <h3 class="panel-title">Global Settings</h3>
+            <h3 class="panel-title">Configurações Gerais</h3>
 
-            <label class="mt-0">Color Theme:</label>
-            <p class="help-text mt-0">Customize the 4 base colors to recolor the entire app interface.</p>
+            <label class="mt-0">Tema de Cores:</label>
+            <p class="help-text mt-0">Personalize as 4 cores base para recolorir toda a interface.</p>
             <div class="dashboard-grid mt-0">
-              <div><label class="mt-0">App Background:</label><input type="color" name="theme_bg" id="theme_bg" value="#000000"></div>
-              <div><label class="mt-0">Surface / Panels:</label><input type="color" name="theme_card" id="theme_card" value="#111111"></div>
-              <div><label class="mt-0">Primary Accent (Highlights):</label><input type="color" name="theme_accent" id="theme_accent" value="#ffffff"></div>
-              <div><label class="mt-0">Main Text:</label><input type="color" name="theme_text" id="theme_text" value="#ffffff"></div>
+              <div><label class="mt-0">Fundo do App:</label><input type="color" name="theme_bg" id="theme_bg" value="#000000"></div>
+              <div><label class="mt-0">Superfície / Painéis:</label><input type="color" name="theme_card" id="theme_card" value="#111111"></div>
+              <div><label class="mt-0">Cor de Destaque:</label><input type="color" name="theme_accent" id="theme_accent" value="#ffffff"></div>
+              <div><label class="mt-0">Texto Principal:</label><input type="color" name="theme_text" id="theme_text" value="#ffffff"></div>
             </div>
 
             <hr>
 
-            <label>Data Sync Interval (Mins):</label><input type="number" name="refresh_min" value="15">
+            <label>Intervalo de Sincronização (Min):</label><input type="number" name="refresh_min" value="15">
             
-            <label class="checkbox-label"><input type="checkbox" id="autoCycle" name="auto_cycle"> Cycle Screens Automatically</label>
-            <p class="help-text">If disabled, screens will only change when you press the button.</p>
+            <label class="checkbox-label"><input type="checkbox" id="autoCycle" name="auto_cycle"> Alternar Telas Automaticamente</label>
+            <p class="help-text">Se desativado, as telas só mudam ao toque do botão.</p>
             
-            <label>Screen Cycle Interval (Secs):</label><input type="number" id="screenIntInput" name="screen_int" value="5">
+            <label>Intervalo de Troca de Tela (Seg):</label><input type="number" id="screenIntInput" name="screen_int" value="5">
 
-            <label class="anim-label">Active Animations:</label>
-            <p class="help-text anim-help">If 'None' is unchecked, select which animations to cycle through.</p>
+            <label class="anim-label">Animações Ativas:</label>
+            <p class="help-text anim-help">Se 'Nenhuma' estiver desmarcada, escolha quais animações alternar.</p>
             <input type="hidden" id="finalMask" name="anim_mask" value="0">
             <div class="anim-grid">
-              <label class="anim-item"><input type="checkbox" id="animNone">🚫 None</label>
-              <label class="anim-item"><input type="checkbox" class="anim-chk" value="2">↔️ Slide Horizontal</label>
-              <label class="anim-item"><input type="checkbox" class="anim-chk" value="4">↕️ Slide Vertical</label>
-              <label class="anim-item"><input type="checkbox" class="anim-chk" value="8">👾 Dissolve (Noise)</label>
-              <label class="anim-item"><input type="checkbox" class="anim-chk" value="16">🎭 Curtain Open</label>
-              <label class="anim-item"><input type="checkbox" class="anim-chk" value="32">🎹 Venetian Blinds</label>
+              <label class="anim-item"><input type="checkbox" id="animNone">🚫 Nenhuma</label>
+              <label class="anim-item"><input type="checkbox" class="anim-chk" value="2">↔️ Deslizar Horizontal</label>
+              <label class="anim-item"><input type="checkbox" class="anim-chk" value="4">↕️ Deslizar Vertical</label>
+              <label class="anim-item"><input type="checkbox" class="anim-chk" value="8">👾 Dissolver (Ruído)</label>
+              <label class="anim-item"><input type="checkbox" class="anim-chk" value="16">🎭 Cortina</label>
+              <label class="anim-item"><input type="checkbox" class="anim-chk" value="32">🎹 Persianas</label>
             </div>
 
-            <label>Time Format:</label>
+            <label>Formato de Hora:</label>
             <div class="radio-group">
-              <label class="radio-label"><input type="radio" name="time_format" value="24"> 24-Hour</label>
-              <label class="radio-label"><input type="radio" name="time_format" value="12"> 12-Hour</label>
+              <label class="radio-label"><input type="radio" name="time_format" value="24"> 24 horas</label>
+              <label class="radio-label"><input type="radio" name="time_format" value="12"> 12 horas</label>
             </div>
-            <p class='help-text'>Format affects both the OLED display and the Web Panel.</p>
+            <p class='help-text'>O formato afeta o display OLED e o painel web.</p>
 
             <hr>
-            <label class="checkbox-label mt-0"><input type="checkbox" id="autoDetect" name="auto_detect"> Detect Location Automatically (IP)</label>
-            <p class='help-text mt-0'>Uses your IP address to determine city, coordinates, and timezone.</p>
+            <label class="checkbox-label mt-0"><input type="checkbox" id="autoDetect" name="auto_detect"> Detectar Localização Automaticamente (IP)</label>
+            <p class='help-text mt-0'>Usa seu endereço IP para determinar cidade, coordenadas e fuso horário.</p>
             <fieldset id="manualFields" class="collapsible">
-              <legend>Manual Location Entry</legend>
-              <label>City Name:</label><input type="text" name="city">
+              <legend>Localização Manual</legend>
+              <label>Cidade:</label><input type="text" name="city">
               <div class="dashboard-grid mt-0">
                 <div><label class="mt-0">Latitude:</label><input type="number" step="any" name="latitude"></div>
                 <div><label class="mt-0">Longitude:</label><input type="number" step="any" name="longitude"></div>
               </div>
               <div class="dashboard-grid mt-0">
-                <div><label class="mt-0">Country:</label><select name="country_code"></select></div>
-                <div><label class="mt-0">Timezone:</label><select name="timezone" id="tz-select"><option value="UTC">UTC</option></select></div>
+                <div><label class="mt-0">País:</label><select name="country_code"></select></div>
+                <div><label class="mt-0">Fuso Horário:</label><select name="timezone" id="tz-select"><option value="UTC">UTC</option></select></div>
               </div>
             </fieldset>
 
             <hr>
-            <label class="checkbox-label mt-0"><input type="checkbox" id="nightMode" name="night_mode"> Enable Night Mode</label>
-            <p class='help-text mt-0'>Set a quiet schedule to pause animations, dim the screen, or save API calls.</p>
+            <label class="checkbox-label mt-0"><input type="checkbox" id="nightMode" name="night_mode"> Ativar Modo Noturno</label>
+            <p class='help-text mt-0'>Defina um horário de silêncio para pausar animações, escurecer a tela e economizar chamadas de API.</p>
             <fieldset id="nightFields" class="collapsible">
-              <legend>Night Schedule</legend>
+              <legend>Agenda Noturna</legend>
               
-              <label class="mt-0">Screen Action:</label>
+              <label class="mt-0">Ação da Tela:</label>
               <select name="night_action" id="nightActionSelect" style="margin-top: 8px;">
-                <option value="0">No Visual Change</option>
-                <option value="1">Dim Display</option>
-                <option value="2">Turn Display Off</option>
-                <option value="3">Dim then Turn Off</option>
+                <option value="0">Sem Mudança Visual</option>
+                <option value="1">Escurecer Tela</option>
+                <option value="2">Desligar Tela</option>
+                <option value="3">Escurecer e Desligar</option>
               </select>
 
               <div id="dimStartContainer" style="display: none;">
-                <label>Dim Start Time:</label><input type="time" name="night_dim_start">
+                <label>Início do Escurecimento:</label><input type="time" name="night_dim_start">
               </div>
 
               <div class="dashboard-grid">
-                <div><label class="mt-0">Start Time:</label><input type="time" name="night_start"></div>
-                <div><label class="mt-0">End Time:</label><input type="time" name="night_end"></div>
+                <div><label class="mt-0">Início:</label><input type="time" name="night_start"></div>
+                <div><label class="mt-0">Fim:</label><input type="time" name="night_end"></div>
               </div>
             </fieldset>
           </div>
 
           <div class="panel">
-            <h3 class="panel-title">Screen Display Order</h3>
-            <p class="help-text order-help">Use the UP/DOWN arrows to rearrange. Disabled screens are locked at the bottom.</p>
+            <h3 class="panel-title">Ordem das Telas</h3>
+            <p class="help-text order-help">Use as setas ▲▼ para reordenar. Telas desativadas ficam travadas embaixo.</p>
             <ul id="sortable-list" class="sortable-list">
-              <li class="sortable-item" data-id="0" data-target="showTime"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Time & Date</li>
-              <li class="sortable-item" data-id="1" data-target="showCalendar"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Calendar</li>
-              <li class="sortable-item" data-id="2" data-target="showWeather"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Weather</li>
-              <li class="sortable-item" data-id="3" data-target="showAQI"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Air Quality</li>
-              <li class="sortable-item" data-id="4" data-target="showDaylight"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Daylight Info</li>
-              <li class="sortable-item" data-id="5" data-target="showStock"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Stock Tracking</li>
-              <li class="sortable-item" data-id="6" data-target="showCrypto"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Crypto Tracking</li>
-              <li class="sortable-item" data-id="7" data-target="showCurrency"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Currency Exchange</li>
-              <li class="sortable-item" data-id="8" data-target="showPc"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>PC Monitor</li>
-              <li class="sortable-item" data-id="9" data-target="showMedia"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>PC Media</li>
-              <li class="sortable-item" data-id="10" data-target="showBambu"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Printer Info</li>
+              <li class="sortable-item" data-id="0" data-target="showTime"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Hora & Data</li>
+              <li class="sortable-item" data-id="1" data-target="showCalendar"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Calendário</li>
+              <li class="sortable-item" data-id="2" data-target="showWeather"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Clima</li>
+              <li class="sortable-item" data-id="3" data-target="showAQI"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Qualidade do Ar</li>
+              <li class="sortable-item" data-id="4" data-target="showDaylight"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Luz do Dia</li>
+              <li class="sortable-item" data-id="5" data-target="showStock"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Ações</li>
+              <li class="sortable-item" data-id="6" data-target="showCrypto"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Criptomoedas</li>
+              <li class="sortable-item" data-id="7" data-target="showCurrency"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Câmbio</li>
+              <li class="sortable-item" data-id="8" data-target="showPc"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Monitor do PC</li>
+              <li class="sortable-item" data-id="9" data-target="showMedia"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Mídia do PC</li>
+              <li class="sortable-item" data-id="10" data-target="showBambu"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Impressora 3D</li>
             </ul>
             <input type="hidden" name="screen_order" id="screenOrderInput">
           </div>
 
           <div id="dynamic-panels-container">
             <div class="panel" id="panel-0">
-              <label class="checkbox-label mt-0"><input type="checkbox" id="showTime" name="show_time"> Time Screen</label>
+              <label class="checkbox-label mt-0"><input type="checkbox" id="showTime" name="show_time"> Tela de Hora</label>
               <div id="timeContent" class="collapsible">
                 <div class="dashboard-grid">
-                  <div class="tile"><div class="tile-icon">🕒</div><div class="tile-value" id="preview-time">--:--</div><div class="tile-label">Current Time</div></div>
-                  <div class="tile"><div class="tile-icon">🌐</div><div class="tile-value" id="preview-tz" style="font-size:1.2rem">--</div><div class="tile-label">Timezone</div></div>
+                  <div class="tile"><div class="tile-icon">🕒</div><div class="tile-value" id="preview-time">--:--</div><div class="tile-label">Hora Atual</div></div>
+                  <div class="tile"><div class="tile-icon">🌐</div><div class="tile-value" id="preview-tz" style="font-size:1.2rem">--</div><div class="tile-label">Fuso Horário</div></div>
                 </div>
-                <label class="checkbox-label"><input type="checkbox" name="date_display"> Display Date Below Time</label>
+                <label class="checkbox-label"><input type="checkbox" name="date_display"> Mostrar Data Abaixo da Hora</label>
               </div>
             </div>
 
             <div class="panel" id="panel-1">
-              <label class="checkbox-label mt-0"><input type="checkbox" id="showCalendar" name="show_calendar"> Calendar Screen</label>
+              <label class="checkbox-label mt-0"><input type="checkbox" id="showCalendar" name="show_calendar"> Tela de Calendário</label>
               <div id="calendarContent" class="collapsible">
                 <div class="dashboard-grid">
-                  <div class="tile"><div class="tile-icon">📅</div><div class="tile-value date-val" id="preview-date">--</div><div class="tile-label">Current Date</div></div>
-                  <div class="tile"><div class="tile-icon">🎉</div><div class="tile-value" id="preview-hol" style="font-size:1.2rem">--</div><div class="tile-label">Holidays Loaded</div></div>
+                  <div class="tile"><div class="tile-icon">📅</div><div class="tile-value date-val" id="preview-date">--</div><div class="tile-label">Data Atual</div></div>
+                  <div class="tile"><div class="tile-icon">🎉</div><div class="tile-value" id="preview-hol" style="font-size:1.2rem">--</div><div class="tile-label">Feriados Carregados</div></div>
                 </div>
-                <label>Start Week On:</label>
+                <label>Semana Começa:</label>
                 <div class="radio-group">
-                  <label class="radio-label"><input type="radio" name="cal_start" value="mon"> Monday</label>
-                  <label class="radio-label"><input type="radio" name="cal_start" value="sun"> Sunday</label>
+                  <label class="radio-label"><input type="radio" name="cal_start" value="mon"> Segunda-feira</label>
+                  <label class="radio-label"><input type="radio" name="cal_start" value="sun"> Domingo</label>
                 </div>
-                <label class="checkbox-label"><input type="checkbox" name="cal_hol"> Show National Holidays</label>
-                <label class="checkbox-label"><input type="checkbox" name="cal_min"> Minimalistic Mode (Hide grid)</label>
+                <label class="checkbox-label"><input type="checkbox" name="cal_hol"> Mostrar Feriados Nacionais</label>
+                <label class="checkbox-label"><input type="checkbox" name="cal_min"> Modo Minimalista (Sem grade)</label>
               </div>
             </div>
 
             <div class="panel" id="panel-2">
-              <label class="checkbox-label mt-0"><input type="checkbox" id="showWeather" name="show_weather"> Weather Screen</label>
+              <label class="checkbox-label mt-0"><input type="checkbox" id="showWeather" name="show_weather"> Tela de Clima</label>
               <div id="weatherContent" class="collapsible">
-                <div id="weather-no-data" class="no-data-tile">☁️ Weather data will be available after sync</div>
+                <div id="weather-no-data" class="no-data-tile">☁️ Dados do clima disponíveis após sincronizar</div>
                 <div id="weather-grid" class="hidden">
                     <div class="dashboard-grid">
-                      <div class="tile"><div class="tile-icon" id="icon-temp">☀️</div><div class="tile-value" id="value-temp">--</div><div class="tile-label">Temperature</div></div>
-                      <div class="tile"><div class="tile-icon">🤒</div><div class="tile-value" id="value-feels">--</div><div class="tile-label">Feels Like</div></div>
-                      <div class="tile"><div class="tile-icon">💧</div><div class="tile-value" id="value-hum">--%</div><div class="tile-label">Humidity</div></div>
-                      <div class="tile"><div class="tile-icon">💨</div><div class="tile-value" id="value-wind">--</div><div class="tile-label">Wind Speed</div></div>
+                      <div class="tile"><div class="tile-icon" id="icon-temp">☀️</div><div class="tile-value" id="value-temp">--</div><div class="tile-label">Temperatura</div></div>
+                      <div class="tile"><div class="tile-icon">🤒</div><div class="tile-value" id="value-feels">--</div><div class="tile-label">Sensação Térmica</div></div>
+                      <div class="tile"><div class="tile-icon">💧</div><div class="tile-value" id="value-hum">--%</div><div class="tile-label">Umidade</div></div>
+                      <div class="tile"><div class="tile-icon">💨</div><div class="tile-value" id="value-wind">--</div><div class="tile-label">Vento</div></div>
                     </div>
-                    <div class="update-footer" id="weather-upd">Last Update: --</div>
+                    <div class="update-footer" id="weather-upd">Última Atualização: --</div>
                 </div>
-                <label>Temperature Unit:</label>
+                <label>Unidade de Temperatura:</label>
                 <div class="radio-group">
                   <label class="radio-label"><input type="radio" name="temp_unit" value="C"> °C</label>
                   <label class="radio-label"><input type="radio" name="temp_unit" value="F"> °F</label>
                 </div>
-                <label class="checkbox-label"><input type="checkbox" name="round_temps"> Round Temperature Values</label>
-                <label class="checkbox-label"><input type="checkbox" name="weather_hide_bar"> Hide Top Bar (Location & Time)</label>
+                <label class="checkbox-label"><input type="checkbox" name="round_temps"> Arredondar Temperaturas</label>
+                <label class="checkbox-label"><input type="checkbox" name="weather_hide_bar"> Ocultar Barra Superior (Local & Hora)</label>
               </div>
             </div>
 
             <div class="panel" id="panel-3">
-              <label class="checkbox-label mt-0"><input type="checkbox" id="showAQI" name="show_aqi"> Air Quality Screen</label>
+              <label class="checkbox-label mt-0"><input type="checkbox" id="showAQI" name="show_aqi"> Tela de Qualidade do Ar</label>
               <div id="aqiContent" class="collapsible">
-                <div id="aqi-no-data" class="no-data-tile">🍃 Air quality data will be available after sync</div>
+                <div id="aqi-no-data" class="no-data-tile">🍃 Dados de qualidade do ar disponíveis após sincronizar</div>
                 <div id="aqi-grid" class="hidden">
                     <div class="dashboard-grid">
-                      <div class="tile"><div class="tile-icon">🍃</div><div class="tile-value" id="value-aqi">--</div><div class="tile-label">AQI Index</div></div>
+                      <div class="tile"><div class="tile-icon">🍃</div><div class="tile-value" id="value-aqi">--</div><div class="tile-label">Índice AQI</div></div>
                       <div class="tile"><div class="tile-icon">🌫️</div><div class="tile-value" id="value-pm25">-- <small>µg</small></div><div class="tile-label">PM 2.5</div></div>
                       <div class="tile"><div class="tile-icon">🏭</div><div class="tile-value" id="value-pm10">-- <small>µg</small></div><div class="tile-label">PM 10</div></div>
-                      <div class="tile"><div class="tile-icon">🧪</div><div class="tile-value" id="value-no2">-- <small>µg</small></div><div class="tile-label">Nitrogen Dioxide</div></div>
+                      <div class="tile"><div class="tile-icon">🧪</div><div class="tile-value" id="value-no2">-- <small>µg</small></div><div class="tile-label">Dióxido de Nitrogênio</div></div>
                     </div>
-                    <div class="update-footer" id="aqi-upd">Last Update: --</div>
+                    <div class="update-footer" id="aqi-upd">Última Atualização: --</div>
                 </div>
-                <label>AQI Standard:</label>
+                <label>Padrão de AQI:</label>
                 <div class="radio-group">
-                  <label class="radio-label"><input type="radio" name="aqi_type" value="US"> US Standard</label>
-                  <label class="radio-label"><input type="radio" name="aqi_type" value="EU"> European Standard</label>
+                  <label class="radio-label"><input type="radio" name="aqi_type" value="US"> Padrão EUA</label>
+                  <label class="radio-label"><input type="radio" name="aqi_type" value="EU"> Padrão Europeu</label>
                 </div>
-                <p class='help-text mt-0'>EU: 0-100+ scale | US: 0-500 scale</p>
-                <label class="checkbox-label"><input type="checkbox" name="aqi_hide_bar"> Hide Top Bar (Location & Time)</label>
+                <p class='help-text mt-0'>UE: escala 0-100+ | EUA: escala 0-500</p>
+                <label class="checkbox-label"><input type="checkbox" name="aqi_hide_bar"> Ocultar Barra Superior (Local & Hora)</label>
               </div>
             </div>
 
             <div class="panel" id="panel-4">
-              <label class="checkbox-label mt-0"><input type="checkbox" id="showDaylight" name="show_daylight"> Daylight Screen</label>
+              <label class="checkbox-label mt-0"><input type="checkbox" id="showDaylight" name="show_daylight"> Tela de Luz do Dia</label>
               <div id="daylightContent" class="collapsible">
-                <div id="daylight-no-data" class="no-data-tile">☀️ Daylight data will be available after sync</div>
+                <div id="daylight-no-data" class="no-data-tile">☀️ Dados solares disponíveis após sincronizar</div>
                 <div id="daylight-grid" class="hidden">
                     <div class="dashboard-grid">
-                      <div class="tile"><div class="tile-icon">🌅</div><div class="tile-value" id="val-sunrise">--:--</div><div class="tile-label">Sunrise</div></div>
-                      <div class="tile"><div class="tile-icon">🌇</div><div class="tile-value" id="val-sunset">--:--</div><div class="tile-label">Sunset</div></div>
-                      <div class="tile"><div class="tile-icon">☀️</div><div class="tile-value" id="val-noon">--:--</div><div class="tile-label">Solar Noon</div></div>
-                      <div class="tile"><div class="tile-icon">⏱️</div><div class="tile-value" id="val-length">--</div><div class="tile-label">Day Length</div></div>
+                      <div class="tile"><div class="tile-icon">🌅</div><div class="tile-value" id="val-sunrise">--:--</div><div class="tile-label">Nascer do Sol</div></div>
+                      <div class="tile"><div class="tile-icon">🌇</div><div class="tile-value" id="val-sunset">--:--</div><div class="tile-label">Pôr do Sol</div></div>
+                      <div class="tile"><div class="tile-icon">☀️</div><div class="tile-value" id="val-noon">--:--</div><div class="tile-label">Meio-dia Solar</div></div>
+                      <div class="tile"><div class="tile-icon">⏱️</div><div class="tile-value" id="val-length">--</div><div class="tile-label">Duração do Dia</div></div>
                     </div>
                 </div>
-                <label class="checkbox-label"><input type="checkbox" name="daylight_min"> Minimalistic Mode (Hide timeline)</label>
+                <label class="checkbox-label"><input type="checkbox" name="daylight_min"> Modo Minimalista (Sem linha do tempo)</label>
               </div>
             </div>
 
             <div class="panel" id="panel-5">
-              <label class="checkbox-label mt-0"><input type="checkbox" id="showStock" name="show_stock"> Stock Tracking Screen</label>
+              <label class="checkbox-label mt-0"><input type="checkbox" id="showStock" name="show_stock"> Tela de Ações</label>
               <div id="stockContent" class="collapsible">
-                <div id="stock-no-data" class="no-data-tile">📈 Stock data will be available after sync</div>
+                <div id="stock-no-data" class="no-data-tile">📈 Dados de ações disponíveis após sincronizar</div>
                 <div id="stock-grid" class="hidden">
                     <div class="dashboard-grid">
-                      <div class="tile"><div class="tile-icon">📊</div><div class="tile-value" id="stock-price" style="font-size:1.0rem; line-height:1.5;">--</div><div class="tile-label">PRICES</div></div>
-                      <div class="tile"><div class="tile-icon">📈</div><div class="tile-value" id="stock-change" style="font-size:1.0rem; line-height:1.5;">--</div><div class="tile-label">24H CHANGE</div></div>
+                      <div class="tile"><div class="tile-icon">📊</div><div class="tile-value" id="stock-price" style="font-size:1.0rem; line-height:1.5;">--</div><div class="tile-label">PREÇOS</div></div>
+                      <div class="tile"><div class="tile-icon">📈</div><div class="tile-value" id="stock-change" style="font-size:1.0rem; line-height:1.5;">--</div><div class="tile-label">VARIAÇÃO 24H</div></div>
                     </div>
-                    <div class="update-footer" id="stock-upd">Last Update: --</div>
+                    <div class="update-footer" id="stock-upd">Última Atualização: --</div>
                 </div>
                 <div id="stock-list-container"></div>
-                <button type="button" class="btn-blue" onclick="addStockRow()">+ Add Stock / ETF</button>
-                <label class="checkbox-label"><input type="checkbox" name="stock_fn"> Display Full Company Name</label>
+                <button type="button" class="btn-blue" onclick="addStockRow()">+ Adicionar Ação / ETF</button>
+                <label class="checkbox-label"><input type="checkbox" name="stock_fn"> Mostrar Nome Completo da Empresa</label>
               </div>
             </div>
 
             <div class="panel" id="panel-6">
-              <label class="checkbox-label mt-0"><input type="checkbox" id="showCrypto" name="show_crypto"> Crypto Tracking Screen</label>
+              <label class="checkbox-label mt-0"><input type="checkbox" id="showCrypto" name="show_crypto"> Tela de Criptomoedas</label>
               <div id="cryptoContent" class="collapsible">
-                <div id="crypto-no-data" class="no-data-tile">💰 Crypto data will be available after sync</div>
+                <div id="crypto-no-data" class="no-data-tile">💰 Dados de cripto disponíveis após sincronizar</div>
                 <div id="crypto-grid" class="hidden">
                     <div class="dashboard-grid">
-                      <div class="tile"><div class="tile-icon">₿</div><div class="tile-value" id="crypto-price" style="font-size:1.0rem; line-height:1.5;">--</div><div class="tile-label">PRICES</div></div>
-                      <div class="tile"><div class="tile-icon">📈</div><div class="tile-value" id="crypto-change" style="font-size:1.0rem; line-height:1.5;">--</div><div class="tile-label">24H CHANGE</div></div>
+                      <div class="tile"><div class="tile-icon">₿</div><div class="tile-value" id="crypto-price" style="font-size:1.0rem; line-height:1.5;">--</div><div class="tile-label">PREÇOS</div></div>
+                      <div class="tile"><div class="tile-icon">📈</div><div class="tile-value" id="crypto-change" style="font-size:1.0rem; line-height:1.5;">--</div><div class="tile-label">VARIAÇÃO 24H</div></div>
                     </div>
-                    <div class="update-footer" id="crypto-upd">Last Update: --</div>
+                    <div class="update-footer" id="crypto-upd">Última Atualização: --</div>
                 </div>
                 <div id="crypto-list-container"></div>
-                <button type="button" class="btn-blue" onclick="addCryptoRow()">+ Add Cryptocurrency</button>
-                <label class="checkbox-label"><input type="checkbox" name="crypto_fn"> Display Full Coin Name</label>
+                <button type="button" class="btn-blue" onclick="addCryptoRow()">+ Adicionar Criptomoeda</button>
+                <label class="checkbox-label"><input type="checkbox" name="crypto_fn"> Mostrar Nome Completo da Cripto</label>
               </div>
             </div>
 
             <div class="panel" id="panel-7">
-              <label class="checkbox-label mt-0"><input type="checkbox" id="showCurrency" name="show_currency"> Currency Exchange Screen</label>
+              <label class="checkbox-label mt-0"><input type="checkbox" id="showCurrency" name="show_currency"> Tela de Câmbio</label>
               <div id="currencyContent" class="collapsible">
-                <div id="currency-no-data" class="no-data-tile">💱 Currency data will be available after sync</div>
+                <div id="currency-no-data" class="no-data-tile">💱 Dados de câmbio disponíveis após sincronizar</div>
                 <div id="currency-grid" class="hidden">
                     <div class="dashboard-grid">
                       <div class="tile"><div class="tile-icon">💵</div><div class="tile-value" id="currency-base-val" style="font-size:1.0rem; line-height:1.5;">--</div><div class="tile-label">BASE</div></div>
-                      <div class="tile"><div class="tile-icon">💱</div><div class="tile-value" id="currency-target-val" style="font-size:1.0rem; line-height:1.5;">--</div><div class="tile-label">EXCHANGE RATE</div></div>
+                      <div class="tile"><div class="tile-icon">💱</div><div class="tile-value" id="currency-target-val" style="font-size:1.0rem; line-height:1.5;">--</div><div class="tile-label">TAXA DE CÂMBIO</div></div>
                     </div>
-                    <div class="update-footer" id="currency-upd">Last Update: --</div>
+                    <div class="update-footer" id="currency-upd">Última Atualização: --</div>
                 </div>
                 <div id="currency-list-container"></div>
-                <button type="button" class="btn-blue" onclick="addCurrencyRow()">+ Add Currency Pair</button>
-                <label class="checkbox-label"><input type="checkbox" name="currency_fn"> Display Full Currency Name</label>
+                <button type="button" class="btn-blue" onclick="addCurrencyRow()">+ Adicionar Par de Moedas</button>
+                <label class="checkbox-label"><input type="checkbox" name="currency_fn"> Mostrar Nome Completo da Moeda</label>
               </div>
             </div>
 
             <div class="panel" id="panel-8">
-              <label class="checkbox-label mt-0"><input type="checkbox" id="showPc" name="show_pc"> PC Monitoring Screen</label>
+              <label class="checkbox-label mt-0"><input type="checkbox" id="showPc" name="show_pc"> Tela de Monitor do PC</label>
               <div id="pcContent" class="collapsible">
-                <div id="pc-no-data" class="no-data-tile">🖥️ PC data will be available after sync</div>
+                <div id="pc-no-data" class="no-data-tile">🖥️ Dados do PC disponíveis após sincronizar</div>
                 <div id="pc-grid" class="hidden">
                   <div class="dashboard-grid">
-                    <div class="tile"><div class="tile-icon">📊</div><div class="tile-value" id="remote-pc-cpu">--%</div><div class="tile-label">CPU Usage</div></div>
-                    <div class="tile"><div class="tile-icon">🧠</div><div class="tile-value" id="remote-pc-ram">--%</div><div class="tile-label">RAM Usage</div></div>
-                    <div class="tile"><div class="tile-icon">💽</div><div class="tile-value" id="remote-pc-disk">--%</div><div class="tile-label">Disk Usage</div></div>
+                    <div class="tile"><div class="tile-icon">📊</div><div class="tile-value" id="remote-pc-cpu">--%</div><div class="tile-label">Uso de CPU</div></div>
+                    <div class="tile"><div class="tile-icon">🧠</div><div class="tile-value" id="remote-pc-ram">--%</div><div class="tile-label">Uso de RAM</div></div>
+                    <div class="tile"><div class="tile-icon">💽</div><div class="tile-value" id="remote-pc-disk">--%</div><div class="tile-label">Uso de Disco</div></div>
                     <div class="tile"><div class="tile-icon">⬇️</div><div class="tile-value" id="remote-pc-net">-- KB/s</div><div class="tile-label">Download</div></div>      
                   </div>
                 </div>
-                <label class="checkbox-label"><input type="checkbox" name="hide_empty_pc"> Hide empty screen</label>
-                <p class="help-text mt-0">Screen is excluded from rotation when there is no data.</p>
+                <label class="checkbox-label"><input type="checkbox" name="hide_empty_pc"> Ocultar tela vazia</label>
+                <p class="help-text mt-0">A tela sai da rotação quando não há dados.</p>
               </div>
             </div>
 
             <div class="panel" id="panel-9">
-              <label class="checkbox-label mt-0"><input type="checkbox" id="showMedia" name="show_media"> PC Media Screen</label>
+              <label class="checkbox-label mt-0"><input type="checkbox" id="showMedia" name="show_media"> Tela de Mídia do PC</label>
               <div id="mediaContent" class="collapsible">
-                <div id="media-no-data" class="no-data-tile">🎵 Media data will be available after sync and/or when media is played</div>
+                <div id="media-no-data" class="no-data-tile">🎵 Dados de mídia disponíveis após sincronizar e/ou quando algo estiver tocando</div>
                 <div id="media-grid" class="hidden">
                   <div class="dashboard-grid">
-                    <div class="tile"><div class="tile-icon">🎵</div><div class="tile-value" id="settings-media-status" style="font-size:1.2rem">Stopped</div><div class="tile-label">Status</div></div>
-                    <div class="tile"><div class="tile-icon">🎧</div><div class="tile-value" id="settings-media-name" style="font-size:1.2rem">No Media</div><div class="tile-label">Track</div></div>
-                    <div class="tile"><div class="tile-icon">👤</div><div class="tile-value" id="settings-media-author" style="font-size:1.2rem">Unknown</div><div class="tile-label">Author</div></div>
-                    <div class="tile"><div class="tile-icon">💿</div><div class="tile-value" id="settings-media-album" style="font-size:1.2rem">Unknown</div><div class="tile-label">Album</div></div>
+                    <div class="tile"><div class="tile-icon">🎵</div><div class="tile-value" id="settings-media-status" style="font-size:1.2rem">Parado</div><div class="tile-label">Status</div></div>
+                    <div class="tile"><div class="tile-icon">🎧</div><div class="tile-value" id="settings-media-name" style="font-size:1.2rem">Sem Mídia</div><div class="tile-label">Faixa</div></div>
+                    <div class="tile"><div class="tile-icon">👤</div><div class="tile-value" id="settings-media-author" style="font-size:1.2rem">Desconhecido</div><div class="tile-label">Artista</div></div>
+                    <div class="tile"><div class="tile-icon">💿</div><div class="tile-value" id="settings-media-album" style="font-size:1.2rem">Desconhecido</div><div class="tile-label">Álbum</div></div>
                   </div>
                 </div>
-                <label class="checkbox-label"><input type="checkbox" name="hide_empty_media"> Hide empty screen</label>
-                <p class="help-text mt-0">Screen is excluded from rotation when there is no data.</p>
+                <label class="checkbox-label"><input type="checkbox" name="hide_empty_media"> Ocultar tela vazia</label>
+                <p class="help-text mt-0">A tela sai da rotação quando não há dados.</p>
               </div>
             </div>
 
             <div class="panel" id="panel-10">
-              <label class="checkbox-label mt-0"><input type="checkbox" id="showBambu" name="show_bambu"> Bambu 3D Printer Screen</label>
+              <label class="checkbox-label mt-0"><input type="checkbox" id="showBambu" name="show_bambu"> Tela da Impressora 3D Bambu</label>
               <div id="bambuContent" class="collapsible">
-                <div id="bambu-no-data" class="no-data-tile">🖨️ Printer data will be available after connection is established</div>
+                <div id="bambu-no-data" class="no-data-tile">🖨️ Dados da impressora disponíveis após estabelecer conexão</div>
                 <div id="bambu-grid" class="hidden">
                     <div class="dashboard-grid">
                       <div class="tile"><div class="tile-icon">🖨️</div><div class="tile-value" id="bambu-status" style="font-size:1.2rem">OFFLINE</div><div class="tile-label">Status</div></div>
-                      <div class="tile"><div class="tile-icon">⏳</div><div class="tile-value" id="bambu-prog" style="font-size:1.1rem">--% | --m<br><span style="font-size:0.9rem">Layer: --/--</span></div><div class="tile-label">Progress</div></div>
-                      <div class="tile"><div class="tile-icon">🌡️</div><div class="tile-value" id="bambu-temps" style="font-size:1.1rem">Nozzle: --/--<br>Bed: --/--</div><div class="tile-label">Temperatures</div></div>
-                      <div class="tile"><div class="tile-icon">💨</div><div class="tile-value" id="bambu-fans" style="font-size:1.2rem">Part: -- | Aux: --</div><div class="tile-label">Fans</div></div>
+                      <div class="tile"><div class="tile-icon">⏳</div><div class="tile-value" id="bambu-prog" style="font-size:1.1rem">--% | --m<br><span style="font-size:0.9rem">Camada: --/--</span></div><div class="tile-label">Progresso</div></div>
+                      <div class="tile"><div class="tile-icon">🌡️</div><div class="tile-value" id="bambu-temps" style="font-size:1.1rem">Bico: --/--<br>Mesa: --/--</div><div class="tile-label">Temperaturas</div></div>
+                      <div class="tile"><div class="tile-icon">💨</div><div class="tile-value" id="bambu-fans" style="font-size:1.2rem">Peça: -- | Aux: --</div><div class="tile-label">Ventoinhas</div></div>
                     </div>
                 </div>
-                <label class="checkbox-label"><input type="checkbox" name="hide_empty_bambu"> Hide empty screen</label>
-                <p class="help-text mt-0">Screen is excluded from rotation when printer is offline.</p>
+                <label class="checkbox-label"><input type="checkbox" name="hide_empty_bambu"> Ocultar tela vazia</label>
+                <p class="help-text mt-0">A tela sai da rotação quando a impressora está offline.</p>
                 
-                <label>Printer IP Address:</label>
-                <input type="text" name="bambu_ip" placeholder="e.g. 192.168.0.100">
-                <label>Printer Serial Number:</label>
-                <input type="text" name="bambu_sn" placeholder="e.g. 00M...">
-                <label>Printer Access Code:</label>
-                <input type="text" name="bambu_code" placeholder="e.g. 1234abcd">
+                <label>IP da Impressora:</label>
+                <input type="text" name="bambu_ip" placeholder="ex: 192.168.0.100">
+                <label>Número de Série da Impressora:</label>
+                <input type="text" name="bambu_sn" placeholder="ex: 00M...">
+                <label>Código de Acesso da Impressora:</label>
+                <input type="text" name="bambu_code" placeholder="ex: 1234abcd">
               </div>
             </div>
           </div> 
-          <button type="button" id="save-settings-btn" class="save-btn mb-20">💾 Save & Apply All Settings</button>
+          <button type="button" id="save-settings-btn" class="save-btn mb-20">💾 Salvar & Aplicar Tudo</button>
         </div>
       </form>
     </div>

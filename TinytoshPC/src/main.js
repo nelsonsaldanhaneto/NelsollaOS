@@ -387,7 +387,7 @@ async function updateStats() {
             }
             
             if (mName) {
-                mName.innerText = hasValidMedia ? data.media_name : "No Media";
+                mName.innerText = hasValidMedia ? data.media_name : "Sem Mídia";
             }
             
             if (mAuthor) {
@@ -437,7 +437,7 @@ function handleDisconnectUI() {
     if(wrap) wrap.classList.add("hidden");
     if(ph) { 
         ph.classList.remove("hidden"); 
-        ph.innerText = "Device configuration will be displayed after connection is established."; 
+        ph.innerText = "As configurações do dispositivo aparecem após a conexão ser estabelecida."; 
     }
     
     const logsPanel = document.getElementById("logs-panel");
@@ -452,13 +452,13 @@ async function loadPorts() {
         const select = document.getElementById("port-select");
         const btn = document.getElementById("conn-btn");
         const currentVal = select.value;
-        const isConnecting = btn && btn.innerText === "Connecting...";
+        const isConnecting = btn && btn.innerText === "Conectando...";
 
         select.innerHTML = ""; 
         
         if (statusObj.ports.length === 0) {
             let opt = document.createElement("option");
-            opt.text = "No Ports Found";
+            opt.text = "Nenhuma Porta Encontrada";
             select.add(opt);
         } else {
             statusObj.ports.forEach((p) => {
@@ -469,8 +469,8 @@ async function loadPorts() {
             });
         }
 
-        if (statusObj.status_text && statusObj.status_text.includes("Scanning") && isConnecting) {
-            btn.innerText = "Connect";
+        if (statusObj.status_text && statusObj.status_text.includes("Procurando") && isConnecting) {
+            btn.innerText = "Conectar";
             btn.disabled = false;
             if (select) select.disabled = false;
         }
@@ -479,18 +479,18 @@ async function loadPorts() {
             select.value = statusObj.connected;
             if (!isConnected) {
                 isConnected = true;
-                if(btn) { btn.innerText = "Disconnect"; btn.className = "btn-secondary"; btn.disabled = false; }
+                if(btn) { btn.innerText = "Desconectar"; btn.className = "btn-secondary"; btn.disabled = false; }
                 if(select) select.disabled = true;
 
                 const ph = document.getElementById("config-placeholder");
-                if(ph && !isConfigLoaded) { ph.innerText = "Connection established - waiting for configuration data..."; }
+                if(ph && !isConfigLoaded) { ph.innerText = "Conexão estabelecida - aguardando dados de configuração..."; }
 
                 setTimeout(fetchDeviceData, POST_CONNECT_SYNC_DELAY_MS);
             }
         } else {
             if (isConnected) {
                 isConnected = false;
-                if(btn) { btn.innerText = "Connect"; btn.className = "btn-secondary"; btn.disabled = false; }
+                if(btn) { btn.innerText = "Conectar"; btn.className = "btn-secondary"; btn.disabled = false; }
                 if(select) select.disabled = false;
                 
                 handleDisconnectUI();
@@ -523,18 +523,18 @@ async function loadPorts() {
             
             if (activeConn.startsWith("Serial:")) {
                 if (currentDeviceIp) {
-                    ipText.innerText = `TINYTOSH IP: ${currentDeviceIp}`;
+                    ipText.innerText = `IP DO NELSOLLAOS: ${currentDeviceIp}`;
                 } else {
-                    ipText.innerText = "TINYTOSH IP: --";
+                    ipText.innerText = "IP DO NELSOLLAOS: --";
                 }
             } else {
                 if (statusObj.target_ip) {
                     currentDeviceIp = statusObj.target_ip;
-                    ipText.innerText = `TINYTOSH IP: ${statusObj.target_ip}`;
+                    ipText.innerText = `IP DO NELSOLLAOS: ${statusObj.target_ip}`;
                 } else if (isConnected && currentDeviceIp) {
-                    ipText.innerText = `TINYTOSH IP: ${currentDeviceIp}`;
+                    ipText.innerText = `IP DO NELSOLLAOS: ${currentDeviceIp}`;
                 } else {
-                    ipText.innerText = "TINYTOSH IP: --";
+                    ipText.innerText = "IP DO NELSOLLAOS: --";
                 }
             }
 
@@ -549,17 +549,17 @@ async function loadPorts() {
                 
                 if (target.startsWith("WiFi:")) {
                     let name = target.split(" ")[1]; 
-                    linkStatus.innerText = "🔒 PAIRED TO " + (name ? name.toUpperCase() : "TINYTOSH");
+                    linkStatus.innerText = "🔒 PAREADO COM " + (name ? name.toUpperCase() : "TINYTOSH");
                     linkStatus.style.color = COLOR_SUCCESS;
                 } 
                 else if (target.startsWith("Serial:")) {
                     let port = target.replace("Serial: ", "");
                     let devName = currentDeviceId ? currentDeviceId.toUpperCase() : "USB DEVICE";
-                    linkStatus.innerText = "🔒 PAIRED TO " + devName;
+                    linkStatus.innerText = "🔒 PAREADO COM " + devName;
                     linkStatus.style.color = COLOR_SUCCESS;
                 }
             } else {
-                linkStatus.innerText = "NOT CONNECTED";
+                linkStatus.innerText = "NÃO CONECTADO";
                 linkStatus.style.color = COLOR_MUTED;
                 currentDeviceId = "";
                 currentDeviceIp = "";
@@ -575,19 +575,19 @@ async function toggleConnection() {
     
     if (!isConnected) {
         const port = select.value;
-        if (!port || port === "No Ports Found") return;
+        if (!port || port === "Nenhuma Porta Encontrada") return;
         try {
             const ph = document.getElementById("config-placeholder");
-            if(ph && !isConfigLoaded) { ph.innerText = "Attempting connection..."; }
+            if(ph && !isConfigLoaded) { ph.innerText = "Tentando conectar..."; }
 
-            btn.innerText = "Connecting...";
+            btn.innerText = "Conectando...";
             btn.disabled = true;
             select.disabled = true;
 
             await invoke("toggle_connection", { portName: port, connect: true });
         } catch (error) {
             setUiStatus(error, COLOR_ERROR);
-            btn.innerText = "Connect";
+            btn.innerText = "Conectar";
             btn.disabled = false;
             select.disabled = false;
         }
@@ -595,7 +595,7 @@ async function toggleConnection() {
         try {
             await invoke("toggle_connection", { portName: "", connect: false });
             isConnected = false;
-            btn.innerText = "Connect"; 
+            btn.innerText = "Conectar"; 
             btn.className = "btn-secondary";
             select.disabled = false;
             handleDisconnectUI();
@@ -997,7 +997,7 @@ async function fetchDeviceData() {
             set('settings-media-status', capitalizedStatus);
             set('settings-media-name', d.media_name);
             set('settings-media-author', d.media_author);
-            set('settings-media-album', d.media_album || 'Unknown');
+            set('settings-media-album', d.media_album || 'Desconhecido');
         } else {
             let nd = document.getElementById('media-no-data'); if(nd) nd.style.display = 'block';
             let gr = document.getElementById('media-grid'); if(gr) gr.classList.add('hidden');
@@ -1022,7 +1022,7 @@ async function fetchDeviceData() {
 
         if (errStr.includes("timeout")) {
             console.warn("Sync timeout. Keeping connection open and waiting for next cycle...");
-            setUiStatus("⚠️ Waiting for device data...", COLOR_MUTED, 5000);
+            setUiStatus("⚠️ Aguardando dados do dispositivo...", COLOR_MUTED, 5000);
         }
     }
 }
@@ -1050,7 +1050,7 @@ window.addStockRow = function(val = null) {
     if (!container || container.children.length >= 5) return;
     const div = document.createElement("div"); div.className = "multi-row";
     let opts = topStocks.map(s => `<option value="${s[1]}">${s[0]} - ${s[1]}</option>`).join('');
-    div.innerHTML = `<div class="input-wrapper"><label class="mt-0">Track Stock/ETF:</label><select name="stock_symbols[]">${opts}</select></div><button type="button" class="btn-remove" onclick="removeRow(this, 'stock-list-container')">-</button>`;
+    div.innerHTML = `<div class="input-wrapper"><label class="mt-0">Ação / ETF:</label><select name="stock_symbols[]">${opts}</select></div><button type="button" class="btn-remove" onclick="removeRow(this, 'stock-list-container')">-</button>`;
     container.appendChild(div);
     if (val) div.querySelector("select").value = val;
     formDirty = true;
@@ -1062,7 +1062,7 @@ window.addCryptoRow = function(val = null) {
     if (!container || container.children.length >= 5) return;
     const div = document.createElement("div"); div.className = "multi-row";
     let opts = topCoins.map(c => `<option value="${c[0]}">${c[1]}</option>`).join('');
-    div.innerHTML = `<div class="input-wrapper"><label class="mt-0">Track Crypto:</label><select name="crypto_ids[]">${opts}</select></div><button type="button" class="btn-remove" onclick="removeRow(this, 'crypto-list-container')">-</button>`;
+    div.innerHTML = `<div class="input-wrapper"><label class="mt-0">Cripto:</label><select name="crypto_ids[]">${opts}</select></div><button type="button" class="btn-remove" onclick="removeRow(this, 'crypto-list-container')">-</button>`;
     container.appendChild(div);
     if (val) div.querySelector("select").value = val;
     formDirty = true;
@@ -1095,7 +1095,7 @@ window.addEventListener("DOMContentLoaded", () => {
         toggleBtn.addEventListener("click", async () => {
             isLoggingPaused = !isLoggingPaused;
             await invoke("toggle_logging", { enable: !isLoggingPaused });
-            toggleBtn.innerText = isLoggingPaused ? "START" : "PAUSE";
+            toggleBtn.innerText = isLoggingPaused ? "INICIAR" : "PAUSAR";
             const logContainer = document.getElementById("log-container");
             if (logContainer) {
                 if (isLoggingPaused) logContainer.classList.add("hidden");
@@ -1176,7 +1176,7 @@ window.addEventListener("DOMContentLoaded", () => {
         e.preventDefault(); 
         
         const saveBtn = document.getElementById('save-settings-btn');
-        saveBtn.innerText = "⏳ Saving...";
+        saveBtn.innerText = "⏳ Salvando...";
         saveBtn.style.opacity = "0.7";
         saveBtn.disabled = true;
         
@@ -1210,20 +1210,20 @@ window.addEventListener("DOMContentLoaded", () => {
             
             await invoke("save_device_settings", { jsonPayload: jsonPayload });
             
-            saveBtn.innerText = "✅ Saved Successfully!";
+            saveBtn.innerText = "✅ Salvo com Sucesso!";
             saveBtn.style.backgroundColor = COLOR_SUCCESS;
             formDirty = false;
             setTimeout(fetchDeviceData, POST_SAVE_SYNC_DELAY_MS);
             
         } catch (err) {
             console.error("Save Error:", err);
-            alert("Backend Error: " + err); 
-            saveBtn.innerText = "❌ Failed to Save";
+            alert("Erro no Backend: " + err); 
+            saveBtn.innerText = "❌ Falha ao Salvar";
             saveBtn.style.backgroundColor = COLOR_ERROR;
         }
 
         setTimeout(() => {
-            saveBtn.innerText = "💾 Save & Apply All Settings";
+            saveBtn.innerText = "💾 Salvar & Aplicar Tudo";
             saveBtn.style.backgroundColor = "var(--primary-main)";
             saveBtn.style.opacity = "1";
             saveBtn.disabled = false;

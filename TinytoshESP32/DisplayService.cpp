@@ -242,8 +242,10 @@ void DisplayService::drawCalendarScreen(const Config& config, const CalendarData
 
     display.setFont(&Picopixel);
     
-    const char* headersMon[] = {"M", "T", "W", "T", "F", "S", "S"};
-    const char* headersSun[] = {"S", "M", "T", "W", "T", "F", "S"};
+    // Iniciais no padrao brasileiro: D S T Q Q S S (as repeticoes de S e Q sao
+    // esperadas — e assim que calendarios em PT-BR abreviam).
+    const char* headersMon[] = {"S", "T", "Q", "Q", "S", "S", "D"};
+    const char* headersSun[] = {"D", "S", "T", "Q", "Q", "S", "S"};
     const char** headers = isMondayFirst ? headersMon : headersSun;
     
     int colCenters[] = {62, 72, 82, 92, 102, 112, 122}; 

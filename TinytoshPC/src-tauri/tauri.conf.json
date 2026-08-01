@@ -10,7 +10,7 @@
     "withGlobalTauri": true,
     "windows": [
     {
-      "title": "Tinytosh PC",
+      "title": "NelsollaOS PC",
       "width": 600,
       "height": 800,
       "resizable": true,

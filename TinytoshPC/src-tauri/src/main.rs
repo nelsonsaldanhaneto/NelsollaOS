@@ -165,12 +165,12 @@ async fn toggle_connection(state: tauri::State<'_, AppState>, port_name: String,
         *state.active_port_name.lock().unwrap() = String::new();
         *state.target_wifi_ip.lock().unwrap() = String::new();
         if let Ok(mut port_lock) = state.port.lock() { *port_lock = None; }
-        *state.status_msg.lock().unwrap() = "⏸️ Disconnected".to_string();
-        Ok("Disconnected".to_string())
+        *state.status_msg.lock().unwrap() = "⏸️ Desconectado".to_string();
+        Ok("Desconectado".to_string())
     } else {
         *manual_guard = false;
         *user_port_guard = port_name;
-        Ok("Connecting...".to_string())
+        Ok("Conectando...".to_string())
     }
 }
 
@@ -199,7 +199,7 @@ async fn fetch_device_data(state: tauri::State<'_, AppState>) -> Result<String, 
         }
         Err("Serial timeout".into())
     } else {
-        Err("Not connected".into())
+        Err("Não conectado".into())
     }
 }
 
@@ -223,7 +223,7 @@ async fn save_device_settings(state: tauri::State<'_, AppState>, json_payload: S
         state.command_queue.lock().unwrap().push(format!("SAVE_CFG:{}\n", json_payload));
         Ok("Sent via Serial".into())
     } else {
-        Err("Not connected".into())
+        Err("Não conectado".into())
     }
 }
 
@@ -243,7 +243,7 @@ fn main() {
         port: Mutex::new(None),
         active_port_name: Mutex::new(String::new()),
         manual_disconnect: Mutex::new(false),
-        status_msg: Mutex::new("Waiting for connection...".to_string()),
+        status_msg: Mutex::new("Aguardando conexão...".to_string()),
         discovered_wifi: Mutex::new(HashMap::new()),
         target_wifi_ip: Mutex::new(String::new()),
         command_queue: Mutex::new(Vec::new()),
@@ -562,7 +562,7 @@ fn main() {
                         if state.port.lock().unwrap().is_some() { *state.port.lock().unwrap() = None; }
                         *state.active_port_name.lock().unwrap() = String::new();
                         *state.target_wifi_ip.lock().unwrap() = String::new();
-                        *state.status_msg.lock().unwrap() = "⏸️ Disconnected".to_string();
+                        *state.status_msg.lock().unwrap() = "⏸️ Desconectado".to_string();
                         phase = AppPhase::Idle;
                         thread::sleep(Duration::from_millis(LOOP_INTERVAL_MS));
                         continue;
@@ -609,7 +609,7 @@ fn main() {
                         AppPhase::Idle => {} 
                         
                         AppPhase::InitScan => {
-                            *state.status_msg.lock().unwrap() = "🔍 Scanning for devices...".to_string();
+                            *state.status_msg.lock().unwrap() = "🔍 Procurando dispositivos...".to_string();
                             *state.active_port_name.lock().unwrap() = String::new();
                             *state.target_wifi_ip.lock().unwrap() = String::new();
                             if state.port.lock().unwrap().is_some() { *state.port.lock().unwrap() = None; }
@@ -644,7 +644,7 @@ fn main() {
 
                         AppPhase::TestUsb(port_name) => {
                             if test_ticks == 0 {
-                                *state.status_msg.lock().unwrap() = format!("⚪ Connecting to USB ({})...", port_name);
+                                *state.status_msg.lock().unwrap() = format!("⚪ Conectando via USB ({})...", port_name);
                                 if let Ok(mut p) = serialport::new(port_name.clone(), SERIAL_BAUD_RATE).timeout(Duration::from_millis(SERIAL_TIMEOUT_MS)).open() {
                                     let _ = p.write(b"GET_UPDATE\n");
                                     *state.port.lock().unwrap() = Some(p);
@@ -681,7 +681,7 @@ fn main() {
                             }
 
                             if handshake_success {
-                                *state.status_msg.lock().unwrap() = "🔌 Connected via USB".to_string();
+                                *state.status_msg.lock().unwrap() = "🔌 Conectado via USB".to_string();
                                 *state.active_port_name.lock().unwrap() = format!("Serial: {}", port_name); 
                                 test_ticks = 0; // Reset tick counter for pushing payload
                                 phase = AppPhase::ConnectedUsb;
@@ -711,7 +711,7 @@ fn main() {
                         }
 
                         AppPhase::TestWifi(ip) => {
-                            *state.status_msg.lock().unwrap() = format!("⚪ Connecting to Wi-Fi ({})...", ip);
+                            *state.status_msg.lock().unwrap() = format!("⚪ Conectando via Wi-Fi ({})...", ip);
                             let url = format!("http://{}/pc-stats", ip);
                             
                             match agent.post(&url).set("Content-Type", "application/json").set("Connection", "close").send_string(&payload) {
@@ -720,13 +720,13 @@ fn main() {
                                     let pretty_name = wifi_map.get(ip).unwrap_or(ip).clone();
                                     *state.active_port_name.lock().unwrap() = format!("WiFi: {} ({})", pretty_name, ip);
                                     *state.target_wifi_ip.lock().unwrap() = ip.clone();
-                                    *state.status_msg.lock().unwrap() = "📶 Connected via WiFi".to_string();
+                                    *state.status_msg.lock().unwrap() = "📶 Conectado via WiFi".to_string();
                                     wifi_failures = 0;
                                     test_ticks = 0; // Reset tick counter for pushing payload
                                     phase = AppPhase::ConnectedWifi;
                                 }
                                 Err(ureq::Error::Status(403, _)) => {
-                                    *state.status_msg.lock().unwrap() = "❌ Device already paired".to_string();
+                                    *state.status_msg.lock().unwrap() = "❌ Dispositivo já pareado".to_string();
                                     state.discovered_wifi.lock().unwrap().remove(ip);
                                     test_ticks = 99; 
                                 }
@@ -807,17 +807,17 @@ fn main() {
                                 match agent.post(&url).set("Content-Type", "application/json").set("Connection", "close").send_string(&payload) {
                                     Ok(_) => { 
                                         wifi_failures = 0; 
-                                        *state.status_msg.lock().unwrap() = "📶 Connected via WiFi".to_string(); 
+                                        *state.status_msg.lock().unwrap() = "📶 Conectado via WiFi".to_string(); 
                                     }
                                     Err(_) => {
                                         wifi_failures += 1;
                                         if wifi_failures >= MAX_WIFI_FAILURES {
-                                            *state.status_msg.lock().unwrap() = "⏳ Connection lost, scanning...".to_string();
+                                            *state.status_msg.lock().unwrap() = "⏳ Conexão perdida, procurando...".to_string();
                                             *state.target_wifi_ip.lock().unwrap() = String::new();
                                             *state.active_port_name.lock().unwrap() = String::new();
                                             phase = AppPhase::InitScan; 
                                         } else {
-                                            *state.status_msg.lock().unwrap() = format!("⏳ Reconnecting ({} / {})...", wifi_failures, MAX_WIFI_FAILURES);
+                                            *state.status_msg.lock().unwrap() = format!("⏳ Reconectando ({} / {})...", wifi_failures, MAX_WIFI_FAILURES);
                                         }
                                     }
                                 }
