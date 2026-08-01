@@ -16,7 +16,10 @@ bool CryptoService::fetchPrice(int id, CryptoData &data) {
 
     if (httpCode == 200) {
         String payload = http.getString();
-        StaticJsonDocument<512> doc;
+        // CoinLore's ticker payload is ~360 bytes of JSON, but ArduinoJson also
+        // needs room for the object tree and its copies of every key and string
+        // value, which overran 512 and failed every fetch with NoMemory.
+        StaticJsonDocument<1024> doc;
         DeserializationError error = deserializeJson(doc, payload);
 
         if (!error) {

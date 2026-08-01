@@ -20,8 +20,11 @@
 #include "BambuService.h"
 
 // Global Constants
-const char* AP_SSID = "Tinytosh";
-const char* AP_PASS = "Tinytosh";
+const char* AP_SSID = "NelsollaOS";
+const char* AP_PASS = "NelsollaOS";
+// Deliberately still upstream's namespace: renaming it points Preferences at a
+// fresh NVS area, orphaning every saved setting (location, screen order, theme)
+// on the first boot after flashing.
 const char* PREF_NAMESPACE = "tinytosh_config";
 
 // Timing & Night Mode Constants
@@ -341,7 +344,7 @@ void updateAllData() {
     }
   }
 
-  displayService.showOLEDStatus({"\n", "\n", "Data Updated", "\n", "\n", "Tinytosh is Ready", "\n", "\n", "Welcome!"}, true);
+  displayService.showOLEDStatus({"\n", "\n", "Data Updated", "\n", "\n", "NelsollaOS is Ready", "\n", "\n", "Welcome!"}, true);
 
   // 10. Save Everything
   configManager.saveConfig(appState.config);
@@ -421,7 +424,7 @@ void setup() {
     String ipAddress = WiFi.localIP().toString();
     String mac = WiFi.macAddress();
     mac.replace(":", "");
-    String uniqueName = "tinytosh-" + mac.substring(8);
+    String uniqueName = "nelsollaos-" + mac.substring(8);
     uniqueName.toLowerCase();
 
     Serial.println("WiFi Connected!"); 

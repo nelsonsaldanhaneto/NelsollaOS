@@ -50,7 +50,7 @@ void DisplayService::begin(int sda, int scl) {
     } else {
         Serial.println("DisplayService: Display initialized.");
         display.clearDisplay();
-        display.drawBitmap(0, 0, icon_hello, 128, 64, SSD1306_WHITE);
+        display.drawBitmap(0, 0, logo_nelsollaos, 128, 64, SSD1306_WHITE);
         display.display();
     }
 }

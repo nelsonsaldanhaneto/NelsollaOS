@@ -61,7 +61,7 @@ void WebServerService::handleRoot() {
   bool daylightValid = daylight.sunrise_mins != -1;
   bool pcValid = pc.cpu_percent > 0.1;
 
-  add("<html><head><title>Tinytosh | Web Panel</title>");
+  add("<html><head><title>NelsollaOS | Web Panel</title>");
   add("<meta name='viewport' content='width=device-width, initial-scale=1'><meta charset='UTF-8'>");
   add("<style>");
   add(":root { --base-bg: #000000; --base-surface: #111111; --base-primary: #ffffff; --base-text: #ffffff; ");
@@ -125,7 +125,7 @@ void WebServerService::handleRoot() {
   add("@media (max-width: 400px) { .dashboard-grid { grid-template-columns: 1fr; } #time-display { font-size: 3.5rem; } }");
   add("</style></head><body><div class='container'>");
 
-  add("<div class='app-header'>Tinytosh</div>");
+  add("<div class='app-header'>NelsollaOS</div>");
   add("<div class='panel header-panel'><div id='time-display'>" + TimeService::getCurrentTimeShort(config.time_format) + "</div>"); 
   add("<h2 id='location-info'>📍 --, -- (--)</h2>"); 
   add("<div id='greetings-text' class='greetings-text'></div>");
@@ -162,7 +162,7 @@ void WebServerService::handleRoot() {
   add("  <div>" + buildPinSelect("scl_pin", "I2C SCL Pin", config.scl_pin) + "</div>");
   add("</div>");
   add(buildPinSelect("touch_pin", "Touch Sensor GPIO Pin", config.touch_pin));
-  add("<p class='help-text mt-0'>Reboot Tinytosh to apply any hardware pin changes.</p>");
+  add("<p class='help-text mt-0'>Reboot NelsollaOS to apply any hardware pin changes.</p>");
   add("</div>");
 
   add("<div class='panel'><h3 class='panel-title'>Global Settings</h3>");

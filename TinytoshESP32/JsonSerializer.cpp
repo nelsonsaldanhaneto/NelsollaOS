@@ -225,8 +225,21 @@ bool JsonSerializer::parseConfig(const char* jsonString, AppState& state) {
     if (doc.containsKey("time_format")) config.time_format = doc["time_format"].as<String>();
     
     if (doc.containsKey("auto_detect")) config.auto_detect = doc["auto_detect"] == 1;
-    if (doc.containsKey("latitude")) config.latitude = doc["latitude"].as<float>();
-    if (doc.containsKey("longitude")) config.longitude = doc["longitude"].as<float>();
+    // Keep the previous value rather than storing a coordinate that cannot exist.
+    // A longitude typed with a comma decimal separator loses the separator and
+    // arrives as a whole number (-42,313072 becomes -42313072). Open-Meteo answers
+    // that with HTTP 400 for both weather and air quality, while sunrise-sunset
+    // accepts it and quietly returns daylight times for nowhere.
+    if (doc.containsKey("latitude")) {
+        float lat = doc["latitude"].as<float>();
+        if (lat >= -90.0f && lat <= 90.0f) config.latitude = lat;
+        else Serial.printf("JsonSerializer: latitude %.4f out of range, keeping %.4f\n", lat, config.latitude);
+    }
+    if (doc.containsKey("longitude")) {
+        float lon = doc["longitude"].as<float>();
+        if (lon >= -180.0f && lon <= 180.0f) config.longitude = lon;
+        else Serial.printf("JsonSerializer: longitude %.4f out of range, keeping %.4f\n", lon, config.longitude);
+    }
     if (doc.containsKey("country")) config.country = doc["country"].as<String>();
     if (doc.containsKey("city")) config.city = doc["city"].as<String>();
     if (doc.containsKey("timezone")) config.timezone = doc["timezone"].as<String>();
