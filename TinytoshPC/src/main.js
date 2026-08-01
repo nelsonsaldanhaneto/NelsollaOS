@@ -46,6 +46,20 @@ const countryGreetings = {
 };
 
 const topStocks = [
+  // B3 (Bolsa brasileira) — sufixo .SA é o formato do Yahoo Finance para a B3.
+  // Espelha o bloco B3 de topStocks em TinytoshESP32/structs.h.
+  ["Ibovespa ETF", "BOVA11.SA"], ["S&P 500 BRL ETF", "IVVB11.SA"], ["Small Caps ETF", "SMAL11.SA"],
+  ["Petrobras PN", "PETR4.SA"], ["Petrobras ON", "PETR3.SA"], ["Vale ON", "VALE3.SA"],
+  ["Itaú Unibanco PN", "ITUB4.SA"], ["Bradesco PN", "BBDC4.SA"], ["Banco do Brasil ON", "BBAS3.SA"],
+  ["Itaúsa PN", "ITSA4.SA"], ["Santander Units", "SANB11.SA"], ["BTG Pactual Units", "BPAC11.SA"],
+  ["Ambev ON", "ABEV3.SA"], ["WEG ON", "WEGE3.SA"], ["B3 ON", "B3SA3.SA"],
+  ["Suzano ON", "SUZB3.SA"], ["Gerdau PN", "GGBR4.SA"], ["CSN ON", "CSNA3.SA"],
+  ["JBS ON", "JBSS3.SA"], ["Localiza ON", "RENT3.SA"], ["Lojas Renner ON", "LREN3.SA"],
+  ["Magazine Luiza ON", "MGLU3.SA"], ["Raia Drogasil ON", "RADL3.SA"], ["Rumo ON", "RAIL3.SA"],
+  ["PRIO ON", "PRIO3.SA"], ["Eletrobras ON", "ELET3.SA"], ["BB Seguridade ON", "BBSE3.SA"],
+  ["Embraer ON", "EMBR3.SA"], ["Cemig PN", "CMIG4.SA"], ["Taesa Units", "TAEE11.SA"],
+  ["Klabin Units", "KLBN11.SA"], ["Hapvida ON", "HAPV3.SA"], ["Vivo ON", "VIVT3.SA"],
+  ["Engie Brasil ON", "EGIE3.SA"], ["Copel PNB", "CPLE6.SA"], ["Sabesp ON", "SBSP3.SA"],
   ["S&P 500 ETF", "SPY"], ["Invesco QQQ (Tech)", "QQQ"], ["Dow Jones ETF", "DIA"],
   ["Vanguard Total Stock", "VTI"], ["Vanguard S&P 500", "VOO"], ["Semiconductor ETF", "SMH"],
   ["Financial Select", "XLF"], ["Health Care Select", "XLV"], ["Energy Select", "XLE"],

@@ -40,7 +40,48 @@ const unsigned char* DisplayService::getAQIBitmap(int val, bool is_eu) {
     }
 }
 
-DisplayService::DisplayService(int width, int height, int reset_pin) : 
+// Folds UTF-8 accented characters (the Portuguese set) to plain ASCII for the
+// GFX built-in font, which renders anything past 0x7E as garbage glyphs.
+// Unknown multi-byte sequences are dropped instead of shown as noise.
+static String asciiFold(const String& in) {
+    struct Fold { const char* utf8; char ascii; };
+    static const Fold table[] = {
+        {"\xC3\xA1", 'a'}, {"\xC3\xA0", 'a'}, {"\xC3\xA2", 'a'}, {"\xC3\xA3", 'a'}, {"\xC3\xA4", 'a'},
+        {"\xC3\xA9", 'e'}, {"\xC3\xA8", 'e'}, {"\xC3\xAA", 'e'}, {"\xC3\xAB", 'e'},
+        {"\xC3\xAD", 'i'}, {"\xC3\xAC", 'i'}, {"\xC3\xAE", 'i'},
+        {"\xC3\xB3", 'o'}, {"\xC3\xB2", 'o'}, {"\xC3\xB4", 'o'}, {"\xC3\xB5", 'o'}, {"\xC3\xB6", 'o'},
+        {"\xC3\xBA", 'u'}, {"\xC3\xB9", 'u'}, {"\xC3\xBB", 'u'}, {"\xC3\xBC", 'u'},
+        {"\xC3\xA7", 'c'}, {"\xC3\xB1", 'n'},
+        {"\xC3\x81", 'A'}, {"\xC3\x80", 'A'}, {"\xC3\x82", 'A'}, {"\xC3\x83", 'A'},
+        {"\xC3\x89", 'E'}, {"\xC3\x8A", 'E'}, {"\xC3\x8D", 'I'},
+        {"\xC3\x93", 'O'}, {"\xC3\x94", 'O'}, {"\xC3\x95", 'O'},
+        {"\xC3\x9A", 'U'}, {"\xC3\x87", 'C'}, {"\xC3\x91", 'N'},
+    };
+    String out;
+    out.reserve(in.length());
+    for (unsigned int i = 0; i < in.length(); ) {
+        unsigned char c = in[i];
+        if (c < 0x80) { out += (char)c; i++; continue; }
+        bool matched = false;
+        for (const Fold& f : table) {
+            size_t flen = strlen(f.utf8);
+            if (in.length() - i >= flen && memcmp(in.c_str() + i, f.utf8, flen) == 0) {
+                out += f.ascii;
+                i += flen;
+                matched = true;
+                break;
+            }
+        }
+        if (!matched) {
+            // Skip the whole unknown UTF-8 sequence (lead byte + continuations).
+            i++;
+            while (i < in.length() && (in[i] & 0xC0) == 0x80) i++;
+        }
+    }
+    return out;
+}
+
+DisplayService::DisplayService(int width, int height, int reset_pin) :
     display(width, height, &Wire, reset_pin) {}
 
 void DisplayService::begin(int sda, int scl) {
@@ -278,8 +319,11 @@ void DisplayService::drawCalendarScreen(const Config& config, const CalendarData
     // screens' header rule (the day-letter row above it sits in the yellow band).
     display.drawFastHLine(0, 13, 128, SSD1306_WHITE);
 
-    int rowY = (numLines == 6) ? 16 : 18; 
-    int rowSpacing = (numLines == 6) ? 9 : 10;
+    // Picopixel is baseline-positioned: digits at baseline Y span roughly
+    // Y-5..Y, and the today-box extends to Y-6. A first-row baseline of 22/24
+    // keeps digits AND box fully below the yellow band (row 16+).
+    int rowY = (numLines == 6) ? 22 : 24;
+    int rowSpacing = (numLines == 6) ? 8 : 9;
 
     int currCol = startCol;
 
@@ -762,6 +806,13 @@ void DisplayService::drawStockScreen(const Config& config, const StockData& data
 
     int16_t x1, y1; uint16_t w, h;
 
+    // B3 tickers arrive as e.g. "PETR4.SA" (Yahoo's B3 format, priced in BRL):
+    // drop the suffix on screen and switch the currency prefix to R$.
+    String displaySymbol = data.symbol;
+    bool isB3 = displaySymbol.endsWith(".SA");
+    if (isB3) displaySymbol = displaySymbol.substring(0, displaySymbol.length() - 3);
+    String currencyPrefix = isB3 ? "R$" : "$";
+
     // 1. Yellow band: company name (optional) on the left, trend on the right.
     bool isPositive = (data.percent_change >= 0);
     const unsigned char* arrowIcon = isPositive ? icon_arrow_up : icon_arrow_down;
@@ -775,7 +826,9 @@ void DisplayService::drawStockScreen(const Config& config, const StockData& data
     display.print(trendStr);
 
     if (config.stock_fn) {
-        String displayName = data.name;
+        // Yahoo names can carry UTF-8 accents ("Petróleo...") the ASCII-only
+        // GFX font would render as garbage — fold them to plain ASCII first.
+        String displayName = asciiFold(data.name);
         int maxLen = 12;
         if (displayName.length() > maxLen) displayName = displayName.substring(0, maxLen - 1) + ".";
         displayName.toUpperCase();
@@ -788,11 +841,11 @@ void DisplayService::drawStockScreen(const Config& config, const StockData& data
     // 2. Blue area: symbol and price
     display.setTextSize(3);
     display.setCursor(4, 20);
-    display.print(data.symbol);
+    display.print(displaySymbol);
 
     display.setTextSize(2);
     display.setCursor(4, 46);
-    display.print("$" + String(data.price));
+    display.print(currencyPrefix + String(data.price));
 }
 
 void DisplayService::drawPcScreen(const PcStats& pcStats) {
