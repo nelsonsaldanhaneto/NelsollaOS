@@ -120,6 +120,11 @@ struct Config {
 
   // Crypto, Currency & Stocks Settings
   String stock_symbols[MAX_MULTI_ENTRIES] = {"AAPL", "", "", "", ""};
+  // Optional per-symbol position (quantity + average purchase price). When
+  // avg > 0 the stock screen shows the owner's return instead of the daily
+  // change, plus the position's current value.
+  float stock_qtys[MAX_MULTI_ENTRIES] = {0};
+  float stock_avgs[MAX_MULTI_ENTRIES] = {0};
   int stock_count = 1;
 
   int crypto_ids[MAX_MULTI_ENTRIES] = {90, 0, 0, 0, 0};

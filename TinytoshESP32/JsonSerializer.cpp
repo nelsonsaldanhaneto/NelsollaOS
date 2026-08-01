@@ -62,6 +62,10 @@ void JsonSerializer::populateConfigDoc(const Config& config, DynamicJsonDocument
     doc["stock_fn"] = config.stock_fn ? 1 : 0;
     JsonArray stArr = doc.createNestedArray("stock_symbols");
     for(int i=0; i<config.stock_count; i++) stArr.add(config.stock_symbols[i]);
+    JsonArray sqArr = doc.createNestedArray("stock_qtys");
+    for(int i=0; i<config.stock_count; i++) sqArr.add(config.stock_qtys[i]);
+    JsonArray saArr = doc.createNestedArray("stock_avgs");
+    for(int i=0; i<config.stock_count; i++) saArr.add(config.stock_avgs[i]);
     
     doc["show_crypto"] = config.show_crypto ? 1 : 0;
     doc["crypto_fn"] = config.crypto_fn ? 1 : 0;
@@ -95,8 +99,11 @@ void JsonSerializer::populateConfigDoc(const Config& config, DynamicJsonDocument
 }
 
 String JsonSerializer::buildConfigJson(const Config& config) {
-    // Sized for MAX_MULTI_ENTRIES=10 across stocks/cryptos/currencies.
-    DynamicJsonDocument doc(3072);
+    // Sized for MAX_MULTI_ENTRIES=10 across stocks/cryptos/currencies plus the
+    // per-stock position arrays. ArduinoJson drops overflowing values SILENTLY,
+    // and a truncated document here corrupts the NVS copy of the config (symbols
+    // came back as empty strings after the next boot) — so keep real headroom.
+    DynamicJsonDocument doc(5120);
     populateConfigDoc(config, doc);
     String output;
     serializeJson(doc, output);
@@ -146,6 +153,12 @@ String JsonSerializer::buildAppStateJson(const AppState& state) {
             obj["symbol"] = state.stocks[i].symbol;
             obj["price"] = String(state.stocks[i].price, 2);
             obj["change"] = String(state.stocks[i].percent_change, 2);
+            // Personal return when a position is registered for this slot.
+            if (state.config.stock_avgs[i] > 0 && state.stocks[i].price > 0) {
+                float gain = ((state.stocks[i].price - state.config.stock_avgs[i]) / state.config.stock_avgs[i]) * 100.0f;
+                obj["gain"] = String(gain, 2);
+                obj["pos_value"] = String(state.config.stock_qtys[i] * state.stocks[i].price, 2);
+            }
         }
     }
 
@@ -296,6 +309,18 @@ bool JsonSerializer::parseConfig(const char* jsonString, AppState& state) {
         config.stock_count = 0;
         for (JsonVariant v : arr) if (config.stock_count < MAX_MULTI_ENTRIES) config.stock_symbols[config.stock_count++] = v.as<String>();
         if (config.stock_count == 0) { config.stock_symbols[0] = "AAPL"; config.stock_count = 1; }
+    }
+    if (doc.containsKey("stock_qtys")) {
+        JsonArray arr = doc["stock_qtys"].as<JsonArray>();
+        int i = 0;
+        for (JsonVariant v : arr) if (i < MAX_MULTI_ENTRIES) config.stock_qtys[i++] = v.as<float>();
+        while (i < MAX_MULTI_ENTRIES) config.stock_qtys[i++] = 0;
+    }
+    if (doc.containsKey("stock_avgs")) {
+        JsonArray arr = doc["stock_avgs"].as<JsonArray>();
+        int i = 0;
+        for (JsonVariant v : arr) if (i < MAX_MULTI_ENTRIES) config.stock_avgs[i++] = v.as<float>();
+        while (i < MAX_MULTI_ENTRIES) config.stock_avgs[i++] = 0;
     }
     
     if (doc.containsKey("show_crypto")) config.show_crypto = doc["show_crypto"] == 1;

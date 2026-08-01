@@ -431,7 +431,7 @@ void WebServerService::handleRoot() {
               add("<div id='stock-no-data' class='no-data-tile'>📈 Dados de ações disponíveis após sincronizar</div><div id='stock-grid' class='hidden'>");
               add("<div class='dashboard-grid'>");
               add("<div class='tile'><div class='tile-icon'>📊</div><div class='tile-value' id='stock-price' style='font-size:1.0rem; line-height:1.5;'>--</div><div class='tile-label'>PREÇOS</div></div>");
-              add("<div class='tile'><div class='tile-icon'>📈</div><div class='tile-value' id='stock-change' style='font-size:1.0rem; line-height:1.5;'>--</div><div class='tile-label'>VARIAÇÃO 24H</div></div>");
+              add("<div class='tile'><div class='tile-icon'>📈</div><div class='tile-value' id='stock-change' style='font-size:1.0rem; line-height:1.5;'>--</div><div class='tile-label'>VALORIZAÇÃO</div></div>");
               add("</div><div class='update-footer' id='stock-upd'>Última Atualização: --</div></div>");
 
               add("<div id='stock-list-container'></div>");
@@ -598,9 +598,9 @@ void WebServerService::handleRoot() {
   add("window.updateRowControls = function(containerId, maxLimit) { const container = document.getElementById(containerId); if(!container) return; const rows = container.children; const addBtn = container.nextElementSibling; if(addBtn && addBtn.tagName === 'BUTTON') { addBtn.style.display = rows.length >= maxLimit ? 'none' : 'block'; } const removeBtns = container.querySelectorAll('.btn-remove'); removeBtns.forEach(btn => { btn.style.display = rows.length <= 1 ? 'none' : 'flex'; }); };");
   add("window.removeRow = function(btn, containerId) { btn.parentElement.remove(); formDirty = true; updateRowControls(containerId, 10); };");
 
-  add("window.addStockRow = function(val = null) { const container = document.getElementById('stock-list-container'); if (!container || container.children.length >= 10) return; const div = document.createElement('div'); div.className = 'multi-row'; let opts = ''; ");
+  add("window.addStockRow = function(val = null, qty = null, avg = null) { const container = document.getElementById('stock-list-container'); if (!container || container.children.length >= 10) return; const div = document.createElement('div'); div.className = 'multi-row'; let opts = ''; ");
   for(auto s : topStocks) { add("opts += `<option value='" + String(s.ticker) + "'>" + String(s.name) + " - " + String(s.ticker) + "</option>`;"); }
-  add("div.innerHTML = `<div class='input-wrapper'><label class='mt-0'>Ação:</label><select name='stock_symbols[]'>${opts}</select></div><button type='button' class='btn-remove' onclick=\"removeRow(this, 'stock-list-container')\">-</button>`; container.appendChild(div); if (val) div.querySelector('select').value = val; formDirty = true; updateRowControls('stock-list-container', 10); };");
+  add("div.innerHTML = `<div class='input-wrapper'><label class='mt-0'>Ação:</label><select name='stock_symbols[]'>${opts}</select></div><div class='input-wrapper' style='max-width:76px'><label class='mt-0'>Qtd:</label><input type='number' step='any' min='0' name='stock_qtys[]' value='0'></div><div class='input-wrapper' style='max-width:90px'><label class='mt-0'>P.Médio:</label><input type='number' step='any' min='0' name='stock_avgs[]' value='0'></div><button type='button' class='btn-remove' onclick=\"removeRow(this, 'stock-list-container')\">-</button>`; container.appendChild(div); if (val) div.querySelector('select').value = val; if (qty) div.querySelector(\"input[name='stock_qtys[]']\").value = qty; if (avg) div.querySelector(\"input[name='stock_avgs[]']\").value = avg; formDirty = true; updateRowControls('stock-list-container', 10); };");
 
   add("window.addCryptoRow = function(val = null) { const container = document.getElementById('crypto-list-container'); if (!container || container.children.length >= 10) return; const div = document.createElement('div'); div.className = 'multi-row'; let opts = ''; ");
   for(auto c : topCoins) { add("opts += `<option value='" + String(c.id) + "'>" + String(c.sym) + "</option>`;"); }
@@ -766,6 +766,8 @@ void WebServerService::handleRoot() {
 
   add("  e.target.querySelectorAll('input[type=\"checkbox\"]').forEach(cb => { jsonObj[cb.name] = cb.checked ? 1 : 0; });");
   add("  jsonObj['stock_symbols'] = Array.from(e.target.querySelectorAll('select[name=\"stock_symbols[]\"]')).map(s => s.value);");
+  add("  jsonObj['stock_qtys'] = Array.from(e.target.querySelectorAll('input[name=\"stock_qtys[]\"]')).map(s => Number(s.value) || 0);");
+  add("  jsonObj['stock_avgs'] = Array.from(e.target.querySelectorAll('input[name=\"stock_avgs[]\"]')).map(s => Number(s.value) || 0);");
   add("  jsonObj['crypto_ids'] = Array.from(e.target.querySelectorAll('select[name=\"crypto_ids[]\"]')).map(s => Number(s.value));");
   add("  jsonObj['currency_bases'] = Array.from(e.target.querySelectorAll('select[name=\"currency_bases[]\"]')).map(s => s.value);");
   add("  jsonObj['currency_targets'] = Array.from(e.target.querySelectorAll('select[name=\"currency_targets[]\"]')).map(s => s.value);");
@@ -863,7 +865,7 @@ void WebServerService::handleRoot() {
   add("    setCb('showPc', d.show_pc);");
 
   add("    setCb('showStock', d.show_stock); setCb('stock_fn', d.stock_fn, true);");
-  add("    const stCont = document.getElementById('stock-list-container'); if (stCont) { stCont.innerHTML = ''; (d.stock_symbols && d.stock_symbols.length > 0 ? d.stock_symbols : ['AAPL']).forEach(s => window.addStockRow(s)); }");
+  add("    const stCont = document.getElementById('stock-list-container'); if (stCont) { stCont.innerHTML = ''; (d.stock_symbols && d.stock_symbols.length > 0 ? d.stock_symbols : ['AAPL']).forEach((s, i) => window.addStockRow(s, d.stock_qtys ? d.stock_qtys[i] : null, d.stock_avgs ? d.stock_avgs[i] : null)); }");
   add("    setCb('showCrypto', d.show_crypto); setCb('crypto_fn', d.crypto_fn, true);");
   add("    const crCont = document.getElementById('crypto-list-container'); if (crCont) { crCont.innerHTML = ''; (d.crypto_ids && d.crypto_ids.length > 0 ? d.crypto_ids : [90]).forEach(c => window.addCryptoRow(c)); }");
   add("    setCb('showCurrency', d.show_currency); setCb('currency_fn', d.currency_fn, true);");
@@ -939,7 +941,7 @@ void WebServerService::handleRoot() {
 
   add("  if (d.stock_data && d.stock_data.length > 0) {");
   add("    hide('stock-no-data', true); hide('stock-grid', false); let p='', c='';");
-  add("    d.stock_data.forEach(s => { p += s.symbol + ': $' + s.price + '<br>'; c += (parseFloat(s.change) >= 0 ? '+' : '') + s.change + '%<br>'; });");
+  add("    d.stock_data.forEach(s => { const b3 = s.symbol.endsWith('.SA'); const sym = b3 ? s.symbol.slice(0, -3) : s.symbol; const cur = b3 ? 'R$' : '$'; p += sym + ': ' + cur + s.price + '<br>'; const v = (s.gain !== undefined) ? s.gain : s.change; c += (parseFloat(v) >= 0 ? '+' : '') + v + '%' + (s.pos_value !== undefined ? ' (' + cur + Math.round(s.pos_value) + ')' : '') + '<br>'; });");
   add("    set('stock-price', p, true); set('stock-change', c, true); set('stock-upd', 'Última Atualização: ' + d.update_time);");
   add("  } else { hide('stock-no-data', false); hide('stock-grid', true); }");
 

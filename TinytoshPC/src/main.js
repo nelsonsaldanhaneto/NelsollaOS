@@ -830,7 +830,7 @@ async function fetchDeviceData() {
             setCb('showStock', d.show_stock);
             setCb('stock_fn', d.stock_fn, true);
             const stCont = document.getElementById("stock-list-container");
-            if (stCont) { stCont.innerHTML = ""; (d.stock_symbols && d.stock_symbols.length > 0 ? d.stock_symbols : ["AAPL"]).forEach(s => window.addStockRow(s)); }
+            if (stCont) { stCont.innerHTML = ""; (d.stock_symbols && d.stock_symbols.length > 0 ? d.stock_symbols : ["AAPL"]).forEach((s, i) => window.addStockRow(s, d.stock_qtys ? d.stock_qtys[i] : null, d.stock_avgs ? d.stock_avgs[i] : null)); }
 
             setCb('showCrypto', d.show_crypto);
             setCb('crypto_fn', d.crypto_fn, true);
@@ -910,7 +910,7 @@ async function fetchDeviceData() {
             set('value-feels', d.apparent_temperature + ' °' + d.temp_unit);
             set('value-hum', d.humidity + '%');
             set('value-wind', d.wind_speed + ' km/h');
-            set('weather-upd', 'Last Update: ' + d.update_time);
+            set('weather-upd', 'Última Atualização: ' + d.update_time);
         } else {
             let nd = document.getElementById('weather-no-data'); if(nd) nd.style.display = 'block';
             let gr = document.getElementById('weather-grid'); if(gr) gr.classList.add('hidden');
@@ -925,7 +925,7 @@ async function fetchDeviceData() {
             set('value-pm25', d.pm25 + ' <small>µg</small>', true);
             set('value-pm10', d.pm10 + ' <small>µg</small>', true);
             set('value-no2', d.no2 + ' <small>µg</small>', true);
-            set('aqi-upd', 'Last Update: ' + d.update_time);
+            set('aqi-upd', 'Última Atualização: ' + d.update_time);
         } else {
             let nd = document.getElementById('aqi-no-data'); if(nd) nd.style.display = 'block';
             let gr = document.getElementById('aqi-grid'); if(gr) gr.classList.add('hidden');
@@ -949,10 +949,12 @@ async function fetchDeviceData() {
             let gr = document.getElementById('stock-grid'); if(gr) gr.classList.remove('hidden');
             let pStr = "", cStr = "";
             d.stock_data.forEach(s => { 
-                pStr += s.symbol + ": $" + s.price + "<br>"; 
-                cStr += (parseFloat(s.change) >= 0 ? "+" : "") + s.change + "%<br>"; 
+                const b3 = s.symbol.endsWith(".SA"); const sym = b3 ? s.symbol.slice(0, -3) : s.symbol; const cur = b3 ? "R$" : "$";
+                pStr += sym + ": " + cur + s.price + "<br>"; 
+                const v = (s.gain !== undefined) ? s.gain : s.change;
+                cStr += (parseFloat(v) >= 0 ? "+" : "") + v + "%" + (s.pos_value !== undefined ? " (" + cur + Math.round(s.pos_value) + ")" : "") + "<br>"; 
             });
-            set('stock-price', pStr, true); set('stock-change', cStr, true); set('stock-upd', 'Last Update: ' + d.update_time);
+            set('stock-price', pStr, true); set('stock-change', cStr, true); set('stock-upd', 'Última Atualização: ' + d.update_time);
         } else {
             let nd = document.getElementById('stock-no-data'); if(nd) nd.style.display = 'block';
             let gr = document.getElementById('stock-grid'); if(gr) gr.classList.add('hidden');
@@ -966,7 +968,7 @@ async function fetchDeviceData() {
                 pStr += s.symbol + ": $" + s.price + "<br>"; 
                 cStr += (parseFloat(s.change) >= 0 ? "+" : "") + s.change + "%<br>"; 
             });
-            set('crypto-price', pStr, true); set('crypto-change', cStr, true); set('crypto-upd', 'Last Update: ' + d.update_time);
+            set('crypto-price', pStr, true); set('crypto-change', cStr, true); set('crypto-upd', 'Última Atualização: ' + d.update_time);
         } else {
             let nd = document.getElementById('crypto-no-data'); if(nd) nd.style.display = 'block';
             let gr = document.getElementById('crypto-grid'); if(gr) gr.classList.add('hidden');
@@ -980,7 +982,7 @@ async function fetchDeviceData() {
                 bStr += s.base_text + "<br>"; 
                 tStr += s.target_text + "<br>"; 
             });
-            set('currency-base-val', bStr, true); set('currency-target-val', tStr, true); set('currency-upd', 'Last Update: ' + d.update_time);
+            set('currency-base-val', bStr, true); set('currency-target-val', tStr, true); set('currency-upd', 'Última Atualização: ' + d.update_time);
         } else {
             let nd = document.getElementById('currency-no-data'); if(nd) nd.style.display = 'block';
             let gr = document.getElementById('currency-grid'); if(gr) gr.classList.add('hidden');
@@ -1059,14 +1061,16 @@ window.removeRow = function(btn, containerId) {
     updateRowControls(containerId, 10);
 };
 
-window.addStockRow = function(val = null) {
+window.addStockRow = function(val = null, qty = null, avg = null) {
     const container = document.getElementById("stock-list-container");
     if (!container || container.children.length >= 10) return;
     const div = document.createElement("div"); div.className = "multi-row";
     let opts = topStocks.map(s => `<option value="${s[1]}">${s[0]} - ${s[1]}</option>`).join('');
-    div.innerHTML = `<div class="input-wrapper"><label class="mt-0">Ação / ETF:</label><select name="stock_symbols[]">${opts}</select></div><button type="button" class="btn-remove" onclick="removeRow(this, 'stock-list-container')">-</button>`;
+    div.innerHTML = `<div class="input-wrapper"><label class="mt-0">Ação / ETF:</label><select name="stock_symbols[]">${opts}</select></div><div class="input-wrapper" style="max-width:76px"><label class="mt-0">Qtd:</label><input type="number" step="any" min="0" name="stock_qtys[]" value="0"></div><div class="input-wrapper" style="max-width:90px"><label class="mt-0">P.Médio:</label><input type="number" step="any" min="0" name="stock_avgs[]" value="0"></div><button type="button" class="btn-remove" onclick="removeRow(this, 'stock-list-container')">-</button>`;
     container.appendChild(div);
     if (val) div.querySelector("select").value = val;
+    if (qty) div.querySelector('input[name="stock_qtys[]"]').value = qty;
+    if (avg) div.querySelector('input[name="stock_avgs[]"]').value = avg;
     formDirty = true;
     updateRowControls('stock-list-container', 10);
 };
@@ -1215,6 +1219,8 @@ window.addEventListener("DOMContentLoaded", () => {
             jsonObj['screen_order'] = document.getElementById('screenOrderInput').value;
 
             jsonObj['stock_symbols'] = Array.from(form.querySelectorAll('select[name="stock_symbols[]"]')).map(s => s.value);
+            jsonObj['stock_qtys'] = Array.from(form.querySelectorAll('input[name="stock_qtys[]"]')).map(s => Number(s.value) || 0);
+            jsonObj['stock_avgs'] = Array.from(form.querySelectorAll('input[name="stock_avgs[]"]')).map(s => Number(s.value) || 0);
             jsonObj['crypto_ids'] = Array.from(form.querySelectorAll('select[name="crypto_ids[]"]')).map(s => Number(s.value));
             jsonObj['currency_bases'] = Array.from(form.querySelectorAll('select[name="currency_bases[]"]')).map(s => s.value);
             jsonObj['currency_targets'] = Array.from(form.querySelectorAll('select[name="currency_targets[]"]')).map(s => s.value);
