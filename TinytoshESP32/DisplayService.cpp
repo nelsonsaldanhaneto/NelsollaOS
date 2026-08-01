@@ -55,36 +55,49 @@ void DisplayService::begin(int sda, int scl) {
     }
 }
 
+// Two-color SSD1306 layout: rows 0-15 are the (physical) yellow band, 16-63
+// the blue area. The first text line becomes a centered title in the yellow
+// band with a separator; everything after renders in the blue area. Leading
+// "\n" entries (the old vertical-centering hack) are skipped; later ones
+// still act as half-line spacing.
 void DisplayService::showOLEDStatus(std::initializer_list<String> lines, bool clear) {
     if (clear) display.clearDisplay();
 
     display.setTextColor(SSD1306_WHITE);
     display.setTextWrap(false);
     display.setTextSize(1);
-    display.setFont(); 
-    
-    int lineHeight = 10;
-    int cursorY = 0;
+    display.setFont();
+
+    int cursorY = 18;
+    bool titleDrawn = false;
     int16_t x1, y1;
     uint16_t w, h;
-    
+
     for (const String& line : lines) {
-        if (line == "\n") { 
-            cursorY += lineHeight / 2;
+        if (line == "\n") {
+            if (titleDrawn) cursorY += 4;
             continue;
         }
 
         display.getTextBounds(line.c_str(), 0, 0, &x1, &y1, &w, &h);
         int xStart = (display.width() - w) / 2;
-        
+
+        if (!titleDrawn) {
+            display.setCursor(xStart, 3);
+            display.print(line);
+            display.drawFastHLine(0, 13, display.width(), SSD1306_WHITE);
+            titleDrawn = true;
+            continue;
+        }
+
         display.setCursor(xStart, cursorY);
         display.print(line);
-        
-        cursorY += lineHeight;
-        
+
+        cursorY += 10;
+
         if (cursorY >= display.height()) break;
     }
-    
+
     display.display();
 }
 
@@ -100,21 +113,24 @@ void DisplayService::drawTimeScreen(const Config& config, String timeStr, String
     uint16_t w, h;
 
     if (config.date_display) {
-        display.setTextSize(3);
-        display.getTextBounds(timeStr, 0, 0, &x1, &y1, &w, &h);
-        display.setCursor((128 - w) / 2, 10);
-        display.print(timeStr);
-
+        // Date as the yellow-band header; the clock sits fully in the blue area
+        // so the digits never straddle the two-color boundary.
         display.setTextSize(1);
         display.getTextBounds(dateStr, 0, 0, &x1, &y1, &w, &h);
-        display.setCursor((128 - w) / 2, 48);
+        display.setCursor((128 - w) / 2, 3);
         display.print(dateStr);
+        display.drawFastHLine(0, 13, 128, SSD1306_WHITE);
+
+        display.setTextSize(3);
+        display.getTextBounds(timeStr, 0, 0, &x1, &y1, &w, &h);
+        display.setCursor((128 - w) / 2, 16 + (48 - (int)h) / 2);
+        display.print(timeStr);
     } else {
         display.setTextSize(4);
         display.getTextBounds(timeStr, 0, 0, &x1, &y1, &w, &h);
 
         int xPos = (128 - w) / 2;
-        int yPos = (64 - h) / 2 - y1;
+        int yPos = 16 + (48 - (int)h) / 2 - y1;
 
         display.setCursor(xPos, yPos);
         display.print(timeStr);
@@ -160,16 +176,18 @@ void DisplayService::drawCalendarScreen(const Config& config, const CalendarData
 
     int16_t x1, y1; uint16_t w, h;
 
+    // Month in the yellow band (header), big day number fully in the blue area.
+    display.setTextSize(1);
+    display.getTextBounds(months[mon], 0, 0, &x1, &y1, &w, &h);
+    display.setCursor((colWidth - w) / 2, 3);
+    display.print(months[mon]);
+
     display.setTextSize(3);
     display.getTextBounds(String(day).c_str(), 0, 0, &x1, &y1, &w, &h);
-    display.setCursor((colWidth - w) / 2, 3);
+    display.setCursor((colWidth - w) / 2, 17);
     display.print(day);
 
     display.setTextSize(1);
-    display.getTextBounds(months[mon], 0, 0, &x1, &y1, &w, &h);
-    display.setCursor((colWidth - w) / 2, 29);
-    display.print(months[mon]);
-
     display.getTextBounds(String(year).c_str(), 0, 0, &x1, &y1, &w, &h);
     display.setCursor((colWidth - w) / 2, 53);
     display.print(year);
@@ -256,8 +274,9 @@ void DisplayService::drawCalendarScreen(const Config& config, const CalendarData
         display.print(headers[i]);
     }
     
-    int lineY = (numLines == 6) ? 8 : 9; 
-    display.drawLine(59, lineY, 126, lineY, SSD1306_WHITE); 
+    // Full-width separator at the yellow/blue boundary, matching the other
+    // screens' header rule (the day-letter row above it sits in the yellow band).
+    display.drawFastHLine(0, 13, 128, SSD1306_WHITE);
 
     int rowY = (numLines == 6) ? 16 : 18; 
     int rowSpacing = (numLines == 6) ? 9 : 10;
@@ -341,7 +360,9 @@ void DisplayService::drawWeatherScreen(const Config& config, const WeatherData& 
     }
 
     // 2. Main Temperature and Icon
-    int yMiddleStart = hideBar ? 7 : 18; 
+    // With the bar hidden the content still starts below the yellow band —
+    // centering it on the full display would straddle the two-color boundary.
+    int yMiddleStart = 18;
     int middleHeight = 35;
     
     display.setTextSize(3); 
@@ -444,7 +465,9 @@ void DisplayService::drawAQIScreen(const Config& config, const AirQualityData& d
     }
 
     // 2. Main AQI Value and Status Icon
-    int yMiddleStart = hideBar ? 7 : 18; 
+    // With the bar hidden the content still starts below the yellow band —
+    // centering it on the full display would straddle the two-color boundary.
+    int yMiddleStart = 18;
     int middleHeight = 35;
     
     display.setTextSize(3); 
@@ -570,8 +593,8 @@ void DisplayService::drawDaylightScreen(const Config& config, const DaylightData
     const unsigned char* rightIcon = isDay ? icon_sun_set : icon_sun_rise;
     const unsigned char* centerIcon = isDay ? icon_sun : icon_moon;
 
-    // 3. Layout Positioning 
-    int iconY = config.daylight_minimal ? 14 : 2; 
+    // 3. Layout Positioning — icons always below the yellow band (row 16+)
+    int iconY = config.daylight_minimal ? 20 : 17;
     int textY = iconY + 24 + 4;
 
     int16_t x1, y1; uint16_t w, h;
@@ -604,27 +627,28 @@ void DisplayService::drawDaylightScreen(const Config& config, const DaylightData
         return;
     }
 
-    // 6. Progress Bar
-    display.drawRect(2, 45, 124, 6, 1);
-    int fillW = (int)((constrain(progress, 0, 100) / 100.0) * 120);
-    if (fillW > 0) display.fillRect(4, 47, fillW, 2, 1);
-
-    // 7. Progress Percentage
-    String progStr = String(progress) + "%";
-    display.getTextBounds(progStr.c_str(), 0, 0, &x1, &y1, &w, &h);
-    display.setCursor(64 - (w / 2), 55);
-    display.print(progStr);
-
-    // 8. Secondary Bottom Text
+    // 6. Summary strip in the yellow band: length | progress % | time left
     String lengthStr = TimeService::formatDurationMins(displayLengthMins);
     lengthStr.replace(" ", "");
-    display.setCursor(2, 55);
+    display.setCursor(2, 3);
     display.print(lengthStr);
+
+    String progStr = String(progress) + "%";
+    display.getTextBounds(progStr.c_str(), 0, 0, &x1, &y1, &w, &h);
+    display.setCursor(64 - (w / 2), 3);
+    display.print(progStr);
 
     String timeLeftStr = String(mins_left / 60) + "h" + String(mins_left % 60) + "m";
     display.getTextBounds(timeLeftStr.c_str(), 0, 0, &x1, &y1, &w, &h);
-    display.setCursor(126 - w, 55);
+    display.setCursor(126 - w, 3);
     display.print(timeLeftStr);
+
+    display.drawFastHLine(0, 13, 128, SSD1306_WHITE);
+
+    // 7. Progress Bar at the bottom of the blue area
+    display.drawRect(2, 56, 124, 6, 1);
+    int fillW = (int)((constrain(progress, 0, 100) / 100.0) * 120);
+    if (fillW > 0) display.fillRect(4, 58, fillW, 2, 1);
 }
 
 void DisplayService::drawCryptoScreen(const Config& config, const CryptoData& data) {
@@ -635,36 +659,40 @@ void DisplayService::drawCryptoScreen(const Config& config, const CryptoData& da
     display.setTextSize(1);
     display.setFont(); 
 
-    // 1. Symbol
-    display.setTextSize(3);
-    display.setCursor(4, 6);
-    display.print(data.symbol);
+    int16_t x1, y1; uint16_t w, h;
 
-    // 2. Full Name
+    // 1. Yellow band: full name (optional) on the left, trend on the right.
+    // The 15px arrow fits the 16px band exactly.
+    bool isPositive = (data.percent_change_24h >= 0);
+    const unsigned char* arrowIcon = isPositive ? icon_arrow_up : icon_arrow_down;
+    display.drawBitmap(111, 0, arrowIcon, 15, 15, 1);
+
+    display.setTextSize(1);
+    String trendPrefix = isPositive ? "+" : "";
+    String trendStr = trendPrefix + String(data.percent_change_24h, 1) + "%";
+    display.getTextBounds(trendStr.c_str(), 0, 0, &x1, &y1, &w, &h);
+    display.setCursor(109 - w, 4);
+    display.print(trendStr);
+
     if (config.crypto_fn) {
-        display.setTextSize(1);
-        display.setCursor(4, 32); 
         String displayName = data.name;
-        int maxLen = 20; 
-        if (displayName.length() > maxLen) displayName = displayName.substring(0, maxLen - 3) + "...";
+        int maxLen = 12;
+        if (displayName.length() > maxLen) displayName = displayName.substring(0, maxLen - 1) + ".";
         displayName.toUpperCase();
+        display.setCursor(4, 4);
         display.print(displayName);
     }
 
-    // 3. Price
+    display.drawFastHLine(0, 13, 128, SSD1306_WHITE);
+
+    // 2. Blue area: symbol and price
+    display.setTextSize(3);
+    display.setCursor(4, 20);
+    display.print(data.symbol);
+
     display.setTextSize(2);
-    display.setCursor(4, 44);
+    display.setCursor(4, 46);
     display.print("$" + String(data.price_usd));
-
-    // 4. Arrow & Percentage
-    bool isPositive = (data.percent_change_24h >= 0);
-    const unsigned char* arrowIcon = isPositive ? icon_arrow_up : icon_arrow_down;
-    display.drawBitmap(102, 3, arrowIcon, 15, 15, 1);
-
-    display.setTextSize(1);
-    display.setCursor(95, 22);
-    String trendPrefix = isPositive ? "+" : ""; 
-    display.print(trendPrefix + String(data.percent_change_24h, 1) + "%");
 }
 
 void DisplayService::drawCurrencyScreen(const Config& config, const CurrencyData& data, int multiplier) {
@@ -675,52 +703,53 @@ void DisplayService::drawCurrencyScreen(const Config& config, const CurrencyData
     display.setTextSize(1);
     display.setFont(); 
 
-    // 1. Base Currency Symbol
-    display.setTextSize(3);
-    display.setCursor(4, 6);
-    display.print(data.base);
+    int16_t x1, y1; uint16_t w, h;
 
-    // 2. Full Currency Name
+    // 1. Yellow band: currency name (optional) left, context "1000 USD =" right.
+    display.setTextSize(1);
+    String topText = String(multiplier) + " " + data.base + " =";
+    topText.toUpperCase();
+    display.getTextBounds(topText, 0, 0, &x1, &y1, &w, &h);
+    int topTextX = 128 - w - 4;
+    display.setCursor(topTextX, 4);
+    display.print(topText);
+
     if (config.currency_fn) {
-        String fullName = "Unknown";
+        String fullName = "Desconhecida";
         for (auto c : allCurrencies) {
             if (data.base.equalsIgnoreCase(c.code)) {
                 fullName = c.name;
                 break;
             }
         }
-        display.setTextSize(1);
-        display.setCursor(4, 32);
-        int maxLen = 20; 
-        if (fullName.length() > maxLen) fullName = fullName.substring(0, maxLen - 3) + "...";
+        int maxAvail = topTextX - 8;
         fullName.toUpperCase();
+        bool truncated = false;
+        display.getTextBounds(fullName, 0, 0, &x1, &y1, &w, &h);
+        while ((int)w > maxAvail && fullName.length() > 1) {
+            fullName = fullName.substring(0, fullName.length() - 1);
+            truncated = true;
+            display.getTextBounds(fullName + ".", 0, 0, &x1, &y1, &w, &h);
+        }
+        if (truncated) fullName += ".";
+        display.setCursor(4, 4);
         display.print(fullName);
     }
 
-    // 3. Calculate Rate & Decimals using the passed Multiplier
+    display.drawFastHLine(0, 13, 128, SSD1306_WHITE);
+
+    // 2. Calculate Rate & Decimals using the passed Multiplier
     float displayRate = data.rate * multiplier;
     int decimals = (displayRate < 10.0) ? 3 : (displayRate < 100.0) ? 2 : (displayRate < 1000.0) ? 1 : 0;
 
-    // 4. Rate and Target Currency
+    // 3. Blue area: base symbol and converted rate
+    display.setTextSize(3);
+    display.setCursor(4, 20);
+    display.print(data.base);
+
     display.setTextSize(2);
-    display.setCursor(4, 44);
+    display.setCursor(4, 46);
     display.print(String(displayRate, decimals) + " " + data.target);
-
-    // 5. Context helper & Equals sign
-    display.setTextSize(1);
-    String topText = String(multiplier) + " " + data.base;
-    int16_t x1, y1; uint16_t wTop, hTop;
-    display.getTextBounds(topText, 0, 0, &x1, &y1, &wTop, &hTop);
-    int topTextX = 128 - wTop - 4;
-    display.setCursor(topTextX, 8); 
-    display.print(topText);
-
-    String eqText = "=";
-    uint16_t wEq, hEq;
-    display.getTextBounds(eqText, 0, 0, &x1, &y1, &wEq, &hEq);
-    int centerOfTopText = topTextX + (wTop / 2);
-    display.setCursor(centerOfTopText - (wEq / 2), 19); 
-    display.print(eqText);
 }
 
 void DisplayService::drawStockScreen(const Config& config, const StockData& data) {
@@ -731,36 +760,39 @@ void DisplayService::drawStockScreen(const Config& config, const StockData& data
     display.setTextSize(1);
     display.setFont(); 
 
-    // 1. Symbol
-    display.setTextSize(3);
-    display.setCursor(4, 6);
-    display.print(data.symbol);
+    int16_t x1, y1; uint16_t w, h;
 
-    // 2. Company Name
+    // 1. Yellow band: company name (optional) on the left, trend on the right.
+    bool isPositive = (data.percent_change >= 0);
+    const unsigned char* arrowIcon = isPositive ? icon_arrow_up : icon_arrow_down;
+    display.drawBitmap(111, 0, arrowIcon, 15, 15, 1);
+
+    display.setTextSize(1);
+    String trendPrefix = isPositive ? "+" : "";
+    String trendStr = trendPrefix + String(data.percent_change, 1) + "%";
+    display.getTextBounds(trendStr.c_str(), 0, 0, &x1, &y1, &w, &h);
+    display.setCursor(109 - w, 4);
+    display.print(trendStr);
+
     if (config.stock_fn) {
-        display.setTextSize(1);
-        display.setCursor(4, 32);
         String displayName = data.name;
-        int maxLen = 20; 
-        if (displayName.length() > maxLen) displayName = displayName.substring(0, maxLen - 3) + "...";
+        int maxLen = 12;
+        if (displayName.length() > maxLen) displayName = displayName.substring(0, maxLen - 1) + ".";
         displayName.toUpperCase();
+        display.setCursor(4, 4);
         display.print(displayName);
     }
 
-    // 3. Price
+    display.drawFastHLine(0, 13, 128, SSD1306_WHITE);
+
+    // 2. Blue area: symbol and price
+    display.setTextSize(3);
+    display.setCursor(4, 20);
+    display.print(data.symbol);
+
     display.setTextSize(2);
-    display.setCursor(4, 44);
+    display.setCursor(4, 46);
     display.print("$" + String(data.price));
-
-    // 4. Arrow & Percentage
-    bool isPositive = (data.percent_change >= 0);
-    const unsigned char* arrowIcon = isPositive ? icon_arrow_up : icon_arrow_down;
-    display.drawBitmap(102, 3, arrowIcon, 15, 15, 1);
-
-    display.setTextSize(1);
-    display.setCursor(95, 22);
-    String trendPrefix = isPositive ? "+" : ""; 
-    display.print(trendPrefix + String(data.percent_change, 1) + "%");
 }
 
 void DisplayService::drawPcScreen(const PcStats& pcStats) {
@@ -846,22 +878,26 @@ void DisplayService::drawMediaScreen(const PcMedia& media) {
     display.setTextSize(1);
     display.setFont(); 
 
-    display.drawBitmap(2, 4, icon_note, 32, 32, 1);
+    int16_t x1, y1; uint16_t w, h;
 
-    display.setFont(&Picopixel);
+    // Yellow band: playback status. Comparisons stay on the English tokens the
+    // PC app sends; only the displayed text is translated.
     String statusStr = media.status;
     statusStr.toUpperCase();
     if (statusStr == "") statusStr = "STOPPED";
-    
-    int16_t x1, y1; uint16_t w, h;
-    display.getTextBounds(statusStr.c_str(), 0, 0, &x1, &y1, &w, &h);
-    display.setCursor(18 - (w / 2), 46);
-    display.print(statusStr);
 
     const unsigned char* iconBits = icon_stop;
-    if (statusStr == "PLAYING") iconBits = icon_play;
-    if (statusStr == "PAUSED")  iconBits = icon_pause;
-    display.drawBitmap(14, 52, iconBits, 8, 8, 1);
+    String statusLabel = "PARADO";
+    if (statusStr == "PLAYING") { iconBits = icon_play;  statusLabel = "TOCANDO"; }
+    if (statusStr == "PAUSED")  { iconBits = icon_pause; statusLabel = "PAUSADO"; }
+
+    display.drawBitmap(2, 4, iconBits, 8, 8, 1);
+    display.setCursor(14, 4);
+    display.print(statusLabel);
+    display.drawFastHLine(0, 13, 128, SSD1306_WHITE);
+
+    // Blue area: note icon beside the track text column.
+    display.drawBitmap(2, 24, icon_note, 32, 32, 1);
 
     auto drawSmartText = [&](String text, int x, int &y, const GFXfont* font, bool isPicopixel, int maxLines) {
         if (text == "") return;
@@ -922,7 +958,7 @@ void DisplayService::drawMediaScreen(const PcMedia& media) {
         y += 6;
     };
 
-    int cursorY = 4;
+    int cursorY = 18;
 
     String trackName = media.name;
     trackName.toUpperCase();
@@ -969,32 +1005,40 @@ void DisplayService::drawBambuScreen(const BambuData& data) {
     bool isIdle = (status == "IDLE" || status == "FINISH" || status == "FINISHED" || status == "FAILED");
 
     if (isIdle) {
-        // 1. Printer Icon & IDLE Text (Left side)
-        display.drawBitmap(22, 9, icon_printer, 32, 32, 1);
-        
+        // 1. Yellow band: screen title
+        int16_t tx1, ty1; uint16_t tw, th;
         display.setTextSize(1);
-        display.setCursor(26, 45);
+        display.getTextBounds("IMPRESSORA 3D", 0, 0, &tx1, &ty1, &tw, &th);
+        display.setCursor((128 - tw) / 2, 3);
+        display.print("IMPRESSORA 3D");
+        display.drawFastHLine(0, 13, 128, SSD1306_WHITE);
+
+        // 2. Printer Icon & IDLE Text (Left side, blue area)
+        display.drawBitmap(22, 20, icon_printer, 32, 32, 1);
+
+        display.setTextSize(1);
+        display.setCursor(26, 55);
         display.print("OCIOSA");
 
         display.setTextSize(2);
 
-        // 2. Nozzle Temp (Top Right)
+        // 3. Nozzle Temp (Top Right)
         String n_val = String((int)round(data.nozzle_temp));
-        int n_circle_x = 79 + (n_val.length() * 12) + 5; 
-        
-        display.drawBitmap(65, 17, icon_nozzle, 8, 8, 1);
-        display.setCursor(79, 13);
-        display.print(n_val);
-        display.drawCircle(n_circle_x, 16, 3, SSD1306_WHITE); 
+        int n_circle_x = 79 + (n_val.length() * 12) + 5;
 
-        // 3. Bed Temp (Bottom Right)
+        display.drawBitmap(65, 25, icon_nozzle, 8, 8, 1);
+        display.setCursor(79, 21);
+        display.print(n_val);
+        display.drawCircle(n_circle_x, 24, 3, SSD1306_WHITE);
+
+        // 4. Bed Temp (Bottom Right)
         String b_val = String((int)round(data.bed_temp));
         int b_circle_x = 79 + (b_val.length() * 12) + 5;
-        
-        display.drawBitmap(65, 41, icon_bed, 8, 8, 1);
-        display.setCursor(79, 37);
+
+        display.drawBitmap(65, 49, icon_bed, 8, 8, 1);
+        display.setCursor(79, 45);
         display.print(b_val);
-        display.drawCircle(b_circle_x, 40, 3, SSD1306_WHITE);
+        display.drawCircle(b_circle_x, 48, 3, SSD1306_WHITE);
 
         return;
     }
@@ -1110,21 +1154,22 @@ void DisplayService::drawInfoScreen(const unsigned char* image, String text) {
     uint16_t w, h;
 
     if (image != nullptr) {
+        // Message as the yellow-band caption, icon centered in the blue area.
         display.setTextSize(1);
-        
+
         display.getTextBounds(text.c_str(), 0, 0, &x1, &y1, &w, &h);
         int textX = (128 - w) / 2;
-        
-        display.drawBitmap(48, 10, image, 32, 32, 1);
-        display.setCursor(textX, 46); 
+
+        display.setCursor(textX, 5);
         display.print(text);
+        display.drawBitmap(48, 22, image, 32, 32, 1);
     } else {
         display.setTextSize(2);
-        
+
         display.getTextBounds(text.c_str(), 0, 0, &x1, &y1, &w, &h);
         int textX = (128 - w) / 2;
-        int textY = (64 - h) / 2;
-        
+        int textY = 16 + (48 - (int)h) / 2;
+
         display.setCursor(textX, textY);
         display.print(text);
     }
