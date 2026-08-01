@@ -200,7 +200,7 @@ String JsonSerializer::buildAppStateJson(const AppState& state) {
     int lastDashSync = activeId.lastIndexOf(':');
     if (lastDashSync > 3) activeId = activeId.substring(0, lastDashSync);
     bool isPcPaired = (activeId != "" && (millis() - state.pc.last_update < 10000));
-    doc["pc_status"] = isPcPaired ? ("🔒 Paired to " + activeId) : "";
+    doc["pc_status"] = isPcPaired ? ("🔒 Pareado com " + activeId) : "";
 
     String output;
     serializeJson(doc, output);

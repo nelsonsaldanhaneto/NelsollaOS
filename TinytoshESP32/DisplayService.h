@@ -25,7 +25,7 @@ public:
     void drawPcScreen(const PcStats& pcStats);
     void drawMediaScreen(const PcMedia& media);
     void drawBambuScreen(const BambuData& bambu);
-    void drawInfoScreen(const unsigned char* image = nullptr, String text = "No Data");
+    void drawInfoScreen(const unsigned char* image = nullptr, String text = "Sem Dados");
 
     void drawScreen(int screenIndex, const AppState& state, int subIndex = 0);
     void animateTransition(int prevScreen, int prevSub, int nextScreen, int nextSub, const AppState& state);

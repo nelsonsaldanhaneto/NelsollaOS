@@ -51,19 +51,20 @@ bool AirQualityService::fetchAirQuality(const Config& config, AirQualityData &da
 }
 
 String AirQualityService::getAQIDescription(int val, bool is_eu) {
+    // Sem acento (fonte ASCII do OLED); rotulos seguindo as faixas da CETESB.
     if (is_eu) {
-        if (val <= 20)  return "Good";
-        if (val <= 40)  return "Fair";
-        if (val <= 60)  return "Moderate";
-        if (val <= 80)  return "Poor";
-        if (val <= 100) return "Very Poor";
-        return "Extreme";
+        if (val <= 20)  return "Boa";
+        if (val <= 40)  return "Razoavel";
+        if (val <= 60)  return "Moderada";
+        if (val <= 80)  return "Ruim";
+        if (val <= 100) return "Muito Ruim";
+        return "Extrema";
     } else {
-        if (val <= 50)  return "Good";
-        if (val <= 100) return "Moderate";
-        if (val <= 150) return "Sensitive";
-        if (val <= 200) return "Unhealthy";
-        if (val <= 300) return "V. Unhealthy";
-        return "Hazardous";
+        if (val <= 50)  return "Boa";
+        if (val <= 100) return "Moderada";
+        if (val <= 150) return "Sensivel";
+        if (val <= 200) return "Ruim";
+        if (val <= 300) return "Muito Ruim";
+        return "Perigosa";
     }
 }

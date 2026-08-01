@@ -109,26 +109,40 @@ String TimeService::getCurrentTimeShort(String format) {
     return String(time_str);
 }
 
+// Nomes em PT-BR, sem acento: a fonte padrao do Adafruit GFX so cobre ASCII,
+// entao acentos virariam lixo no OLED. O locale C do ESP32 (newlib) so produz
+// nomes em ingles via strftime, dai as tabelas proprias.
+static const char* MESES_ABREV[] = {"Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+                                    "Jul", "Ago", "Set", "Out", "Nov", "Dez"};
+static const char* DIAS_SEMANA[] = {"Domingo", "Segunda", "Terca", "Quarta",
+                                    "Quinta", "Sexta", "Sabado"};
+
 String TimeService::getCurrentTime(String format) {
     time_t now = time(nullptr);
     struct tm timeinfo;
     localtime_r(&now, &timeinfo);
-    
+
     char time_str[24];
     if (format == "12") {
-        strftime(time_str, sizeof(time_str), "%I:%M %d %b", &timeinfo);
+        snprintf(time_str, sizeof(time_str), "%02d:%02d %02d %s",
+                 (timeinfo.tm_hour % 12 == 0) ? 12 : timeinfo.tm_hour % 12,
+                 timeinfo.tm_min, timeinfo.tm_mday, MESES_ABREV[timeinfo.tm_mon]);
     } else {
-        strftime(time_str, sizeof(time_str), "%H:%M %d %b", &timeinfo);
+        snprintf(time_str, sizeof(time_str), "%02d:%02d %02d %s",
+                 timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_mday,
+                 MESES_ABREV[timeinfo.tm_mon]);
     }
     return String(time_str);
 }
 
 String TimeService::getFullDate() {
   struct tm timeinfo;
-  if (!getLocalTime(&timeinfo)) return "No Date";
-  
+  if (!getLocalTime(&timeinfo)) return "Sem Data";
+
   char buffer[32];
-  strftime(buffer, sizeof(buffer), "%A, %b %d", &timeinfo);
+  // "Sexta, 31 Jul" — ordem dia-mes, como se le no Brasil.
+  snprintf(buffer, sizeof(buffer), "%s, %02d %s", DIAS_SEMANA[timeinfo.tm_wday],
+           timeinfo.tm_mday, MESES_ABREV[timeinfo.tm_mon]);
   return String(buffer);
 }
 

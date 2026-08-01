@@ -4,13 +4,14 @@
 WeatherService::WeatherService() {}
 
 String WeatherService::getWeatherDescription(int wmo_code) {
-    if (wmo_code == 0) return "Clear Sky";
-    if (wmo_code >= 1 && wmo_code <= 3) return "Cloudy";
-    if (wmo_code >= 45 && wmo_code <= 48) return "Fog";
-    if (wmo_code >= 51 && wmo_code <= 67) return "Rain";
-    if (wmo_code >= 71 && wmo_code <= 77) return "Snow";
-    if (wmo_code >= 95) return "Thunder";
-    return "Unknown";
+    // Sem acento: a fonte do OLED so cobre ASCII ("Ceu Limpo", nao "Céu").
+    if (wmo_code == 0) return "Ceu Limpo";
+    if (wmo_code >= 1 && wmo_code <= 3) return "Nublado";
+    if (wmo_code >= 45 && wmo_code <= 48) return "Neblina";
+    if (wmo_code >= 51 && wmo_code <= 67) return "Chuva";
+    if (wmo_code >= 71 && wmo_code <= 77) return "Neve";
+    if (wmo_code >= 95) return "Tempestade";
+    return "Desconhecido";
 }
 
 String WeatherService::getWeatherIcon(int wmo_code) {

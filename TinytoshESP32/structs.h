@@ -20,18 +20,20 @@ enum ScreenType {
   NUM_SCREENS
 };
 
+// Exibidos apenas no painel web (UTF-8), então acentuação é segura aqui —
+// diferente das strings desenhadas no OLED, que precisam ficar em ASCII.
 inline constexpr const char* SCREEN_NAMES[] = {
-  "Time & Date",
-  "Calendar",
-  "Weather",
-  "Air Quality",
-  "Daylight Info",
-  "Stock Tracking",
-  "Crypto Tracking",
-  "Currency Exchange",
-  "PC Monitor",
-  "PC Media",
-  "Printer Info"
+  "Hora & Data",
+  "Calendário",
+  "Clima",
+  "Qualidade do Ar",
+  "Luz do Dia",
+  "Ações",
+  "Criptomoedas",
+  "Câmbio",
+  "Monitor do PC",
+  "Mídia do PC",
+  "Impressora 3D"
 };
 
 enum AnimType {

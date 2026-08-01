@@ -133,8 +133,9 @@ void DisplayService::drawCalendarScreen(const Config& config, const CalendarData
     int year = timeinfo.tm_year + 1900;
     int wday = timeinfo.tm_wday; 
 
-    const char* months[] = {"JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
-    const char* weekdays[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+    // PT-BR sem acento/cedilha (fonte ASCII do OLED): MARCO no lugar de MARÇO.
+    const char* months[] = {"JANEIRO", "FEVEREIRO", "MARCO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"};
+    const char* weekdays[] = {"Domingo", "Segunda", "Terca", "Quarta", "Quinta", "Sexta", "Sabado"};
 
     // 1. Check if Today is a Holiday
     String todayHolidayName = "";
@@ -322,7 +323,7 @@ void DisplayService::drawWeatherScreen(const Config& config, const WeatherData& 
     // 1. Header (City and Time)
     if (!hideBar) {
         display.setTextSize(1);
-        String cityStr = valid ? config.city : "No Location";
+        String cityStr = valid ? config.city : "Sem Local";
         
         int yHeader = 2; 
         display.setCursor(2, yHeader);
@@ -367,7 +368,7 @@ void DisplayService::drawWeatherScreen(const Config& config, const WeatherData& 
 
     // 3. Weather Description
     display.setTextSize(1);
-    String desc = valid ? WeatherService::getWeatherDescription(data.weather_code) : "No Data";
+    String desc = valid ? WeatherService::getWeatherDescription(data.weather_code) : "Sem Dados";
     display.getTextBounds(desc.c_str(), 0, 0, &x1, &y1, &w, &h);
     
     int xDesc = xRightEdge - w; 
@@ -425,7 +426,7 @@ void DisplayService::drawAQIScreen(const Config& config, const AirQualityData& d
     // 1. Header (City and Time)
     if (!hideBar) {
         display.setTextSize(1);
-        String cityStr = valid ? config.city : "No Location";
+        String cityStr = valid ? config.city : "Sem Local";
         
         int yHeader = 2; 
         display.setCursor(2, yHeader);
@@ -476,7 +477,7 @@ void DisplayService::drawAQIScreen(const Config& config, const AirQualityData& d
 
     // 3. Status Description
     display.setTextSize(1);
-    String desc = valid ? data.status : "No Data";
+    String desc = valid ? data.status : "Sem Dados";
     display.getTextBounds(desc.c_str(), 0, 0, &x1, &y1, &w, &h);
     
     int xDesc = xRightEdge - w; 
@@ -524,7 +525,7 @@ void DisplayService::drawAQIScreen(const Config& config, const AirQualityData& d
 
 void DisplayService::drawDaylightScreen(const Config& config, const DaylightData& data) {
     if (data.sunrise_mins == -1) {
-        drawInfoScreen(nullptr, "No Daylight Data"); 
+        drawInfoScreen(nullptr, "Sem Dados Solares"); 
         return; 
     }
 
@@ -832,7 +833,7 @@ void DisplayService::drawMediaScreen(const PcMedia& media) {
     bool isInvalid = (media.status.length() == 0 || media.name.length() == 0 || media.author.length() == 0 || media.name.equalsIgnoreCase("Unknown"));
 
     if (isInvalid) {
-        drawInfoScreen(icon_note, "No Media"); 
+        drawInfoScreen(icon_note, "Sem Midia"); 
         return; 
     }
 
@@ -950,7 +951,7 @@ void DisplayService::drawBambuScreen(const BambuData& data) {
     bool isInvalid = (data.status == "SYNCING" || data.status.length() == 0);
 
     if (isInvalid) {
-        drawInfoScreen(icon_printer, "No Printer"); 
+        drawInfoScreen(icon_printer, "Sem Impressora"); 
         return; 
     }
 
@@ -971,7 +972,7 @@ void DisplayService::drawBambuScreen(const BambuData& data) {
         
         display.setTextSize(1);
         display.setCursor(26, 45);
-        display.print("IDLE");
+        display.print("OCIOSA");
 
         display.setTextSize(2);
 
@@ -1043,7 +1044,7 @@ void DisplayService::drawBambuScreen(const BambuData& data) {
     String fileName = data.file_name;
     
     if (fileName.length() == 0 || fileName.equalsIgnoreCase("None")) {
-        fileName = "Idle";
+        fileName = "Ociosa";
     }
         
     int maxWidth = 120; 

@@ -253,11 +253,11 @@ void handleLongPress() {
 
   if (appState.config.screen_auto_cycle) {
     Serial.println("🔄 Auto Cycle: ENABLED");
-    displayService.drawInfoScreen(icon_unlock, "Auto Cycle On");
+    displayService.drawInfoScreen(icon_unlock, "Rotacao Ligada");
     displayService.display.display();
   } else {
     Serial.println("🔒 Auto Cycle: DISABLED (Screen Locked)");
-    displayService.drawInfoScreen(icon_lock, "Auto Cycle Off");
+    displayService.drawInfoScreen(icon_lock, "Rotacao Travada");
     displayService.display.display();
   }
   
@@ -275,14 +275,14 @@ void updateAllData() {
 
   // 1. Location Detection
   if (appState.config.auto_detect) {
-    displayService.showOLEDStatus({"\n", "\n", "Detecting Location...", "\n", "Please wait..."}, true);
+    displayService.showOLEDStatus({"\n", "\n", "Detectando Local...", "\n", "Aguarde..."}, true);
     if (timeService.fetchLocationData(appState.config)) {
       Serial.println("Location updated via IP");
     }
   }
 
   // 2. Sync Time (Depends on Location/Timezone)
-  displayService.showOLEDStatus({"\n", "\n", "Syncing Time...", "\n", "Timezone:", appState.config.timezone}, true);
+  displayService.showOLEDStatus({"\n", "\n", "Sincronizando Hora...", "\n", "Fuso:", appState.config.timezone}, true);
   timeService.syncNTP(appState.config.timezone);
 
   struct tm timeinfo;
@@ -292,33 +292,33 @@ void updateAllData() {
 
   // 3. Fetch Calendar (Holidays - Depends on Country (Country Code))
   if (appState.config.show_calendar && appState.config.calendar_show_holidays && appState.calendar.last_fetch_year != current_year) {  
-    displayService.showOLEDStatus({"\n", "\n", "Updating Calendar...", "\n", "Country:", appState.config.country}, true);
+    displayService.showOLEDStatus({"\n", "\n", "Atualizando Calendario...", "\n", "Pais:", appState.config.country}, true);
     calendarService.fetchHolidays(appState.config.country_code, appState.calendar);
   }
 
   // 4. Fetch Weather (Depends on Lat/Lon)
   if (appState.config.show_weather) {  
-    displayService.showOLEDStatus({"\n", "\n", "Updating Weather...", "\n", "Location:", appState.config.city}, true);
+    displayService.showOLEDStatus({"\n", "\n", "Atualizando Clima...", "\n", "Local:", appState.config.city}, true);
     String updateTime = TimeService::getCurrentTime(appState.config.time_format);
     weatherService.fetchWeather(appState.config, appState.weather, updateTime);
   }
 
   // 5. Fetch Air Quality (Depends on Lat/Lon)
   if (appState.config.show_aqi) {  
-    displayService.showOLEDStatus({"\n", "\n", "Updating AQI...", "\n", "Location:", appState.config.city}, true);
+    displayService.showOLEDStatus({"\n", "\n", "Atualizando Qualid. Ar...", "\n", "Local:", appState.config.city}, true);
     airQualityService.fetchAirQuality(appState.config, appState.aqi);
   }
 
   // 6. Fetch Daylight (Depends on Lat/Lon)
   if (appState.config.show_daylight && appState.daylight.last_fetch_yday != current_yday) {  
-    displayService.showOLEDStatus({"\n", "\n", "Updating Daylight...", "\n", "Location:", appState.config.city}, true);
+    displayService.showOLEDStatus({"\n", "\n", "Atualizando Sol...", "\n", "Local:", appState.config.city}, true);
     daylightService.fetchDaylight(appState.config, appState.daylight);
   }
 
   // 7. Fetch Stocks (Independent)
   if (appState.config.show_stock) {
     for (int i = 0; i < appState.config.stock_count; i++) {
-      displayService.showOLEDStatus({"\n", "\n", "Updating Stocks...", "\n", "Stock:", appState.config.stock_symbols[i]}, true);
+      displayService.showOLEDStatus({"\n", "\n", "Atualizando Acoes...", "\n", "Acao:", appState.config.stock_symbols[i]}, true);
       stockService.fetchStock(appState.config.stock_symbols[i], appState.stocks[i]);
     }
   }
@@ -326,7 +326,7 @@ void updateAllData() {
   // 8. Fetch Crypto (Independent)
   if (appState.config.show_crypto) { 
     for (int i = 0; i < appState.config.crypto_count; i++) {
-      displayService.showOLEDStatus({"\n", "\n", "Updating Crypto...", "\n", "Ticker ID:", String(appState.config.crypto_ids[i])}, true);
+      displayService.showOLEDStatus({"\n", "\n", "Atualizando Cripto...", "\n", "Ticker ID:", String(appState.config.crypto_ids[i])}, true);
       cryptoService.fetchPrice(appState.config.crypto_ids[i], appState.cryptos[i]);
     }
   }
@@ -339,12 +339,12 @@ void updateAllData() {
       String targetUpper = String(appState.config.currency_targets[i]);
       targetUpper.toUpperCase();
 
-      displayService.showOLEDStatus({"\n", "\n", "Updating Currency...", "\n", "Currencies:", baseUpper + " -> " + targetUpper}, true);
+      displayService.showOLEDStatus({"\n", "\n", "Atualizando Moedas...", "\n", "Par:", baseUpper + " -> " + targetUpper}, true);
       currencyService.fetchRate(appState.config.currency_bases[i], appState.config.currency_targets[i], appState.currencies[i]);
     }
   }
 
-  displayService.showOLEDStatus({"\n", "\n", "Data Updated", "\n", "\n", "NelsollaOS is Ready", "\n", "\n", "Welcome!"}, true);
+  displayService.showOLEDStatus({"\n", "\n", "Dados Atualizados", "\n", "\n", "NelsollaOS Pronto", "\n", "\n", "Bem-vindo!"}, true);
 
   // 10. Save Everything
   configManager.saveConfig(appState.config);
@@ -407,7 +407,7 @@ void setup() {
   displayService.begin(appState.config.sda_pin, appState.config.scl_pin);
   delay(3000);
 
-  displayService.showOLEDStatus({"\n", "\n", "Starting...", "\n", "\n", "Config Loaded!"}, true);
+  displayService.showOLEDStatus({"\n", "\n", "Iniciando...", "\n", "\n", "Config Carregada!"}, true);
   bambuService.begin(&appState.config, &appState.bambu);
 
   WiFiManager wm;
@@ -415,10 +415,10 @@ void setup() {
   wm.setConnectRetries(3);
 
   wm.setAPCallback([](WiFiManager* m) {
-    displayService.showOLEDStatus({"\n", "WiFi not connected", "\n", "Connect to WiFi:", AP_SSID, "\n", "Password:", AP_PASS}, true);
+    displayService.showOLEDStatus({"\n", "WiFi desconectado", "\n", "Conecte na rede:", AP_SSID, "\n", "Senha:", AP_PASS}, true);
   });
 
-  displayService.showOLEDStatus({"\n", "\n", "Connecting...", "\n", "\n", "Searching WiFi..."}, true);
+  displayService.showOLEDStatus({"\n", "\n", "Conectando...", "\n", "\n", "Buscando WiFi..."}, true);
 
   if (wm.autoConnect(AP_SSID, AP_PASS)) {
     String ipAddress = WiFi.localIP().toString();
@@ -449,7 +449,7 @@ void setup() {
 
   } else {
     Serial.println("Failed to connect and timed out. Staying in AP Mode.");
-    displayService.showOLEDStatus({"\n", "Connect Failed!", "\n", "Use Web Panel to set WiFi."}, true);
+    displayService.showOLEDStatus({"\n", "Falha na conexao!", "\n", "Configure o WiFi no painel."}, true);
   }
 
   // 5. Initialize Web Server

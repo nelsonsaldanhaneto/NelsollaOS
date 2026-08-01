@@ -135,7 +135,7 @@ void WebServerService::handleRoot() {
   if (lastDash > 3) pairedPc = pairedPc.substring(0, lastDash);
 
   bool isPcPaired = (pairedPc != "" && (millis() - pc.last_update < 5000));
-  String pcStatus = isPcPaired ? ("🔒 Paired to " + pairedPc) : "";
+  String pcStatus = isPcPaired ? ("🔒 Pareado com " + pairedPc) : "";
   String ipAddress = WiFi.localIP().toString();
 
   add("<div class='identity-box'>");
@@ -146,7 +146,7 @@ void WebServerService::handleRoot() {
 
   add("<form method='get' action='/save'>");
   
-  add("<div class='panel'><h3 class='panel-title'>Hardware Setup</h3>");
+  add("<div class='panel'><h3 class='panel-title'>Configuração de Hardware</h3>");
   add("<div class='dashboard-grid mt-0'>");
   
   auto buildPinSelect = [&](String name, String label, int currentValue) {
@@ -158,34 +158,34 @@ void WebServerService::handleRoot() {
       return out;
   };
 
-  add("  <div>" + buildPinSelect("sda_pin", "I2C SDA Pin", config.sda_pin) + "</div>");
-  add("  <div>" + buildPinSelect("scl_pin", "I2C SCL Pin", config.scl_pin) + "</div>");
+  add("  <div>" + buildPinSelect("sda_pin", "Pino I2C SDA", config.sda_pin) + "</div>");
+  add("  <div>" + buildPinSelect("scl_pin", "Pino I2C SCL", config.scl_pin) + "</div>");
   add("</div>");
-  add(buildPinSelect("touch_pin", "Touch Sensor GPIO Pin", config.touch_pin));
-  add("<p class='help-text mt-0'>Reboot NelsollaOS to apply any hardware pin changes.</p>");
+  add(buildPinSelect("touch_pin", "Pino GPIO do Sensor de Toque", config.touch_pin));
+  add("<p class='help-text mt-0'>Reinicie o NelsollaOS para aplicar mudanças nos pinos.</p>");
   add("</div>");
 
-  add("<div class='panel'><h3 class='panel-title'>Global Settings</h3>");
-  add("<label class='mt-0'>Color Theme:</label>");
-  add("<p class='help-text mt-0'>Customize the 4 base colors to recolor the entire app interface.</p>");
+  add("<div class='panel'><h3 class='panel-title'>Configurações Gerais</h3>");
+  add("<label class='mt-0'>Tema de Cores:</label>");
+  add("<p class='help-text mt-0'>Personalize as 4 cores base para recolorir toda a interface.</p>");
   add("<div class='dashboard-grid mt-0'>");
-  add("  <div><label class='mt-0'>App Background:</label><input type='color' name='theme_bg' id='theme_bg' value='" + config.theme_bg + "'></div>");
-  add("  <div><label class='mt-0'>Surface / Panels:</label><input type='color' name='theme_card' id='theme_card' value='" + config.theme_card + "'></div>");
-  add("  <div><label class='mt-0'>Primary Accent (Highlights):</label><input type='color' name='theme_accent' id='theme_accent' value='" + config.theme_accent + "'></div>");
-  add("  <div><label class='mt-0'>Main Text:</label><input type='color' name='theme_text' id='theme_text' value='" + config.theme_text + "'></div>");
+  add("  <div><label class='mt-0'>Fundo do App:</label><input type='color' name='theme_bg' id='theme_bg' value='" + config.theme_bg + "'></div>");
+  add("  <div><label class='mt-0'>Superfície / Painéis:</label><input type='color' name='theme_card' id='theme_card' value='" + config.theme_card + "'></div>");
+  add("  <div><label class='mt-0'>Cor de Destaque:</label><input type='color' name='theme_accent' id='theme_accent' value='" + config.theme_accent + "'></div>");
+  add("  <div><label class='mt-0'>Texto Principal:</label><input type='color' name='theme_text' id='theme_text' value='" + config.theme_text + "'></div>");
   add("</div><hr>");
 
-  add("<label>Data Sync Interval (Mins):</label><input type='number' name='refresh_min' value='" + String(config.refresh_interval_min) + "'>");
-  add("<label class='checkbox-label mt-0' style='margin-top: 10px !important;'><input type='checkbox' id='autoCycle' name='auto_cycle' value='1' " + String(config.screen_auto_cycle ? "checked" : "") + "> Cycle Screens Automatically</label>");
-  add("<p class='help-text mt-0'>If disabled, screens will only change when you press the button.</p>");
-  add("<label>Screen Cycle Interval (Secs):</label><input type='number' id='screenIntInput' name='screen_int' value='" + String(config.screen_interval_sec) + "'>");
+  add("<label>Intervalo de Sincronização (Min):</label><input type='number' name='refresh_min' value='" + String(config.refresh_interval_min) + "'>");
+  add("<label class='checkbox-label mt-0' style='margin-top: 10px !important;'><input type='checkbox' id='autoCycle' name='auto_cycle' value='1' " + String(config.screen_auto_cycle ? "checked" : "") + "> Alternar Telas Automaticamente</label>");
+  add("<p class='help-text mt-0'>Se desativado, as telas só mudam ao toque do botão.</p>");
+  add("<label>Intervalo de Troca de Tela (Seg):</label><input type='number' id='screenIntInput' name='screen_int' value='" + String(config.screen_interval_sec) + "'>");
 
-  add("<label class='anim-label'>Active Animations:</label>");
-  add("<p class='help-text mt-0' style='margin-bottom: 10px;'>If 'None' is unchecked, select which animations to cycle through.</p>");
+  add("<label class='anim-label'>Animações Ativas:</label>");
+  add("<p class='help-text mt-0' style='margin-bottom: 10px;'>Se 'Nenhuma' estiver desmarcada, escolha quais animações alternar.</p>");
   add("<div class='anim-grid'>");
   
   const char* animLabels[] = {
-    "🚫 None", "↔️ Slide Horizontal", "↕️ Slide Vertical", "👾 Dissolve (Noise)", "🎭 Curtain Open", "🎹 Venetian Blinds"
+    "🚫 Nenhuma", "↔️ Deslizar Horizontal", "↕️ Deslizar Vertical", "👾 Dissolver (Ruído)", "🎭 Cortina", "🎹 Persianas"
   };
 
   add("<input type='hidden' id='finalMask' name='anim_mask' value='" + String(config.anim_mask) + "'>");
@@ -201,19 +201,19 @@ void WebServerService::handleRoot() {
   }
   add("</div>");
 
-  add("<label>Time Format:</label><div class='radio-group'>");
-  add("<label class='radio-label'><input type='radio' name='time_format' value='24' " + String(config.time_format == "24" ? "checked" : "") + "> 24-Hour</label>");
-  add("<label class='radio-label'><input type='radio' name='time_format' value='12' " + String(config.time_format == "12" ? "checked" : "") + "> 12-Hour</label></div>");
-  add("<p class='help-text'>Format affects both the OLED display and the Web Panel.</p>");
+  add("<label>Formato de Hora:</label><div class='radio-group'>");
+  add("<label class='radio-label'><input type='radio' name='time_format' value='24' " + String(config.time_format == "24" ? "checked" : "") + "> 24 horas</label>");
+  add("<label class='radio-label'><input type='radio' name='time_format' value='12' " + String(config.time_format == "12" ? "checked" : "") + "> 12 horas</label></div>");
+  add("<p class='help-text'>O formato afeta o display OLED e o painel web.</p>");
 
   add("<hr>");
 
-  add("<label class='checkbox-label mt-0'><input type='checkbox' id='autoDetect' name='auto_detect' value='1' " + String(config.auto_detect ? "checked" : "") + "> Detect Location Automatically (IP)</label>");
-  add("<p class='help-text mt-0'>Uses your IP address to determine city, coordinates, and timezone.</p>");
+  add("<label class='checkbox-label mt-0'><input type='checkbox' id='autoDetect' name='auto_detect' value='1' " + String(config.auto_detect ? "checked" : "") + "> Detectar Localização Automaticamente (IP)</label>");
+  add("<p class='help-text mt-0'>Usa seu endereço IP para determinar cidade, coordenadas e fuso horário.</p>");
 
   add("<fieldset id='manualFields' class='collapsible'>");
-  add("<legend>Manual Location Entry</legend>");
-  add("<label>City Name:</label><input type='text' name='city' value='" + config.city + "'>");
+  add("<legend>Localização Manual</legend>");
+  add("<label>Cidade:</label><input type='text' name='city' value='" + config.city + "'>");
   
   add("<div class='dashboard-grid mt-0'>");
   add("  <div><label class='mt-0'>Latitude:</label><input type='number' step='any' name='latitude' value='" + String(config.latitude, 4) + "'></div>");
@@ -221,13 +221,13 @@ void WebServerService::handleRoot() {
   add("</div>");
 
   add("<div class='dashboard-grid mt-0'>");
-  add("  <div><label class='mt-0'>Country:</label><select name='country_code'>");
+  add("  <div><label class='mt-0'>País:</label><select name='country_code'>");
   for(auto c : allCountries) {
       add("<option value='" + String(c.code) + "'" + (String(config.country_code) == String(c.code) ? " selected" : "") + ">" + String(c.name) + "</option>");
   }
   add("  </select></div>");
 
-  add("  <div><label class='mt-0'>Timezone:</label><select name='timezone'>");
+  add("  <div><label class='mt-0'>Fuso Horário:</label><select name='timezone'>");
   
   const char* tzCursor = POSIX_TIMEZONE_MAP;
   while ((tzCursor = strchr(tzCursor, '"')) != nullptr) {
@@ -257,29 +257,29 @@ void WebServerService::handleRoot() {
   add("  </select></div>");
   add("</div></fieldset><hr>");
   
-  add("<label class='checkbox-label mt-0'><input type='checkbox' id='nightMode' name='night_mode' value='1' " + String(config.night_mode ? "checked" : "") + "> Enable Night Mode</label>");
-  add("<p class='help-text mt-0'>Set a quiet schedule to pause animations, dim the screen, or save API calls.</p>");
+  add("<label class='checkbox-label mt-0'><input type='checkbox' id='nightMode' name='night_mode' value='1' " + String(config.night_mode ? "checked" : "") + "> Ativar Modo Noturno</label>");
+  add("<p class='help-text mt-0'>Defina um horário de silêncio para pausar animações, escurecer a tela e economizar chamadas de API.</p>");
 
   add("<fieldset id='nightFields' class='collapsible'>");
-  add("<legend>Night Schedule</legend>");
-  add("<label class='mt-0'>Screen Action:</label><select name='night_action' id='nightActionSelect' style='margin-top: 8px;'>");
-  add("<option value='0' " + String(config.night_action == 0 ? "selected" : "") + ">No Visual Change</option>");
-  add("<option value='1' " + String(config.night_action == 1 ? "selected" : "") + ">Dim Display</option>");
-  add("<option value='2' " + String(config.night_action == 2 ? "selected" : "") + ">Turn Display Off</option>");
-  add("<option value='3' " + String(config.night_action == 3 ? "selected" : "") + ">Dim then Turn Off</option>");
+  add("<legend>Agenda Noturna</legend>");
+  add("<label class='mt-0'>Ação da Tela:</label><select name='night_action' id='nightActionSelect' style='margin-top: 8px;'>");
+  add("<option value='0' " + String(config.night_action == 0 ? "selected" : "") + ">Sem Mudança Visual</option>");
+  add("<option value='1' " + String(config.night_action == 1 ? "selected" : "") + ">Escurecer Tela</option>");
+  add("<option value='2' " + String(config.night_action == 2 ? "selected" : "") + ">Desligar Tela</option>");
+  add("<option value='3' " + String(config.night_action == 3 ? "selected" : "") + ">Escurecer e Desligar</option>");
   add("</select>");
 
   add("<div id='dimStartContainer' style='display: none;'>");
-  add("  <label>Dim Start Time:</label><input type='time' name='night_dim_start' value='" + String(config.night_dim_start) + "'>");
+  add("  <label>Início do Escurecimento:</label><input type='time' name='night_dim_start' value='" + String(config.night_dim_start) + "'>");
   add("</div>");
 
   add("<div class='dashboard-grid'>"); 
-  add("  <div><label class='mt-0'>Start Time:</label><input type='time' name='night_start' value='" + String(config.night_start) + "'></div>");
-  add("  <div><label class='mt-0'>End Time:</label><input type='time' name='night_end' value='" + String(config.night_end) + "'></div>");
+  add("  <div><label class='mt-0'>Início:</label><input type='time' name='night_start' value='" + String(config.night_start) + "'></div>");
+  add("  <div><label class='mt-0'>Fim:</label><input type='time' name='night_end' value='" + String(config.night_end) + "'></div>");
   add("</div></fieldset></div>");
 
-  add("<div class='panel'><h3 class='panel-title'>Screen Display Order</h3>");
-  add("<p class='help-text mt-0' style='margin-bottom: 15px;'>Drag and drop to rearrange. Disabled screens are locked at the bottom.</p>");
+  add("<div class='panel'><h3 class='panel-title'>Ordem das Telas</h3>");
+  add("<p class='help-text mt-0' style='margin-bottom: 15px;'>Arraste e solte para reordenar. Telas desativadas ficam travadas embaixo.</p>");
   add("<ul id='sortable-list' class='sortable-list'>");
   
   for (int screenId = 0; screenId < NUM_SCREENS; screenId++) {
@@ -310,245 +310,245 @@ void WebServerService::handleRoot() {
       switch (screenId) {
           case SCREEN_TIME: {
               add("<div class='panel' id='panel-" + String(screenId) + "'>");
-              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showTime' name='show_time' value='1' " + String(config.show_time ? "checked" : "") + "> Time Screen</label>");
+              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showTime' name='show_time' value='1' " + String(config.show_time ? "checked" : "") + "> Tela de Hora</label>");
               add("<div id='timeContent' class='collapsible'>");
               
               add("<div class='dashboard-grid'>");
-              add("<div class='tile'><div class='tile-icon'>🕒</div><div class='tile-value' id='preview-time'>" + TimeService::getCurrentTimeShort(config.time_format) + "</div><div class='tile-label'>Current Time</div></div>");
-              add("<div class='tile'><div class='tile-icon'>🌐</div><div class='tile-value' id='preview-tz' style='font-size:1.2rem'>" + config.timezone + "</div><div class='tile-label'>Timezone</div></div>");
+              add("<div class='tile'><div class='tile-icon'>🕒</div><div class='tile-value' id='preview-time'>" + TimeService::getCurrentTimeShort(config.time_format) + "</div><div class='tile-label'>Hora Atual</div></div>");
+              add("<div class='tile'><div class='tile-icon'>🌐</div><div class='tile-value' id='preview-tz' style='font-size:1.2rem'>" + config.timezone + "</div><div class='tile-label'>Fuso Horário</div></div>");
               add("</div>");
               
-              add("<label class='checkbox-label'><input type='checkbox' name='date_display' value='1' " + String(config.date_display ? "checked" : "") + "> Display Date Below Time</label>");
+              add("<label class='checkbox-label'><input type='checkbox' name='date_display' value='1' " + String(config.date_display ? "checked" : "") + "> Mostrar Data Abaixo da Hora</label>");
               add("</div></div>");
               break;
           }
 
           case SCREEN_CALENDAR: {
               add("<div class='panel' id='panel-" + String(screenId) + "'>");
-              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showCalendar' name='show_calendar' value='1' " + String(config.show_calendar ? "checked" : "") + "> Calendar Screen</label>");
+              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showCalendar' name='show_calendar' value='1' " + String(config.show_calendar ? "checked" : "") + "> Tela de Calendário</label>");
               add("<div id='calendarContent' class='collapsible'>");
               
-              String holText = (state->calendar.count > 0) ? String(state->calendar.count) : "No holiday data";
+              String holText = (state->calendar.count > 0) ? String(state->calendar.count) : "Sem feriados";
               
               add("<div class='dashboard-grid'>");
-              add("<div class='tile'><div class='tile-icon'>📅</div><div class='tile-value date-val' id='preview-date'>" + TimeService::getFullDate() + "</div><div class='tile-label'>Current Date</div></div>");
-              add("<div class='tile'><div class='tile-icon'>🎉</div><div class='tile-value' id='preview-hol' style='font-size:1.2rem'>" + holText + "</div><div class='tile-label'>Holidays Loaded</div></div>");
+              add("<div class='tile'><div class='tile-icon'>📅</div><div class='tile-value date-val' id='preview-date'>" + TimeService::getFullDate() + "</div><div class='tile-label'>Data Atual</div></div>");
+              add("<div class='tile'><div class='tile-icon'>🎉</div><div class='tile-value' id='preview-hol' style='font-size:1.2rem'>" + holText + "</div><div class='tile-label'>Feriados Carregados</div></div>");
               add("</div>");
               
-              add("<label>Start Week On:</label><div class='radio-group'>");
-              add("<label class='radio-label'><input type='radio' name='cal_start' value='mon' " + String(config.calendar_start_day == "mon" ? "checked" : "") + "> Monday</label>");
-              add("<label class='radio-label'><input type='radio' name='cal_start' value='sun' " + String(config.calendar_start_day == "sun" ? "checked" : "") + "> Sunday</label></div>");
+              add("<label>Semana Começa:</label><div class='radio-group'>");
+              add("<label class='radio-label'><input type='radio' name='cal_start' value='mon' " + String(config.calendar_start_day == "mon" ? "checked" : "") + "> Segunda-feira</label>");
+              add("<label class='radio-label'><input type='radio' name='cal_start' value='sun' " + String(config.calendar_start_day == "sun" ? "checked" : "") + "> Domingo</label></div>");
               
-              add("<label class='checkbox-label'><input type='checkbox' name='cal_hol' value='1' " + String(config.calendar_show_holidays ? "checked" : "") + "> Show National Holidays</label>");
-              add("<label class='checkbox-label'><input type='checkbox' name='cal_min' value='1' " + String(config.calendar_minimal ? "checked" : "") + "> Minimalistic Mode (Hide grid)</label>");
+              add("<label class='checkbox-label'><input type='checkbox' name='cal_hol' value='1' " + String(config.calendar_show_holidays ? "checked" : "") + "> Mostrar Feriados Nacionais</label>");
+              add("<label class='checkbox-label'><input type='checkbox' name='cal_min' value='1' " + String(config.calendar_minimal ? "checked" : "") + "> Modo Minimalista (Sem grade)</label>");
               add("</div></div>");
               break;
           }
           
           case SCREEN_WEATHER: {
               add("<div class='panel' id='panel-" + String(screenId) + "'>");
-              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showWeather' name='show_weather' value='1' " + String(config.show_weather ? "checked" : "") + "> Weather Screen</label>");
+              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showWeather' name='show_weather' value='1' " + String(config.show_weather ? "checked" : "") + "> Tela de Clima</label>");
               add("<div id='weatherContent' class='collapsible'>");
               
               if (!weatherValid) {
-                  add("<div id='weather-no-data' class='no-data-tile'>☁️ Weather data will be available after sync</div><div id='weather-grid' class='hidden'>");
+                  add("<div id='weather-no-data' class='no-data-tile'>☁️ Dados do clima disponíveis após sincronizar</div><div id='weather-grid' class='hidden'>");
               } else {
-                  add("<div id='weather-no-data' class='no-data-tile hidden'>☁️ Weather data will be available after sync</div><div id='weather-grid'>");
+                  add("<div id='weather-no-data' class='no-data-tile hidden'>☁️ Dados do clima disponíveis após sincronizar</div><div id='weather-grid'>");
               }
               
               add("<div class='dashboard-grid'>");
-              add("<div class='tile'><div class='tile-icon' id='icon-temp'>" + WeatherService::getWeatherIcon(weather.weather_code) + "</div><div class='tile-value' id='value-temp'>" + String(weather.temp, 1) + " °" + config.temp_unit + "</div><div class='tile-label'>Temperature</div></div>");
-              add("<div class='tile'><div class='tile-icon'>🤒</div><div class='tile-value' id='value-feels'>" + String(weather.apparent_temperature, 1) + " °" + config.temp_unit + "</div><div class='tile-label'>Feels Like</div></div>");
-              add("<div class='tile'><div class='tile-icon'>💧</div><div class='tile-value' id='value-hum'>" + String(weather.humidity) + "%</div><div class='tile-label'>Humidity</div></div>");
-              add("<div class='tile'><div class='tile-icon'>💨</div><div class='tile-value' id='value-wind'>" + String(weather.wind_speed, 1) + " km/h</div><div class='tile-label'>Wind Speed</div></div>");
-              add("</div><div class='update-footer' id='weather-upd'>Last Update: " + weather.update_time + "</div></div>");
+              add("<div class='tile'><div class='tile-icon' id='icon-temp'>" + WeatherService::getWeatherIcon(weather.weather_code) + "</div><div class='tile-value' id='value-temp'>" + String(weather.temp, 1) + " °" + config.temp_unit + "</div><div class='tile-label'>Temperatura</div></div>");
+              add("<div class='tile'><div class='tile-icon'>🤒</div><div class='tile-value' id='value-feels'>" + String(weather.apparent_temperature, 1) + " °" + config.temp_unit + "</div><div class='tile-label'>Sensação Térmica</div></div>");
+              add("<div class='tile'><div class='tile-icon'>💧</div><div class='tile-value' id='value-hum'>" + String(weather.humidity) + "%</div><div class='tile-label'>Umidade</div></div>");
+              add("<div class='tile'><div class='tile-icon'>💨</div><div class='tile-value' id='value-wind'>" + String(weather.wind_speed, 1) + " km/h</div><div class='tile-label'>Vento</div></div>");
+              add("</div><div class='update-footer' id='weather-upd'>Última Atualização: " + weather.update_time + "</div></div>");
               
-              add("<label>Temperature Unit:</label><div class='radio-group'>");
+              add("<label>Unidade de Temperatura:</label><div class='radio-group'>");
               add("<label class='radio-label'><input type='radio' name='temp_unit' value='C' " + String(config.temp_unit == "C" ? "checked" : "") + "> °C</label>");
               add("<label class='radio-label'><input type='radio' name='temp_unit' value='F' " + String(config.temp_unit == "F" ? "checked" : "") + "> °F</label></div>");
               
-              add("<label class='checkbox-label'><input type='checkbox' name='round_temps' value='1' " + String(config.round_temps ? "checked" : "") + "> Round Temperature Values</label>");
-              add("<label class='checkbox-label'><input type='checkbox' name='weather_hide_bar' value='1' " + String(config.weather_hide_bar ? "checked" : "") + "> Hide Top Bar (Location & Time)</label>");
+              add("<label class='checkbox-label'><input type='checkbox' name='round_temps' value='1' " + String(config.round_temps ? "checked" : "") + "> Arredondar Temperaturas</label>");
+              add("<label class='checkbox-label'><input type='checkbox' name='weather_hide_bar' value='1' " + String(config.weather_hide_bar ? "checked" : "") + "> Ocultar Barra Superior (Local & Hora)</label>");
               add("</div></div>");
               break;
           }
 
           case SCREEN_AIR_QUALITY: {
               add("<div class='panel' id='panel-" + String(screenId) + "'>");
-              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showAQI' name='show_aqi' value='1' " + String(config.show_aqi ? "checked" : "") + "> Air Quality Screen</label>");
+              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showAQI' name='show_aqi' value='1' " + String(config.show_aqi ? "checked" : "") + "> Tela de Qualidade do Ar</label>");
               add("<div id='aqiContent' class='collapsible'>");
 
               if (!aqiValid) {
-                  add("<div id='aqi-no-data' class='no-data-tile'>🍃 Air quality data will be available after sync</div><div id='aqi-grid' class='hidden'>");
+                  add("<div id='aqi-no-data' class='no-data-tile'>🍃 Dados de qualidade do ar disponíveis após sincronizar</div><div id='aqi-grid' class='hidden'>");
               } else {
-                  add("<div id='aqi-no-data' class='no-data-tile hidden'>🍃 Air quality data will be available after sync</div><div id='aqi-grid'>");
+                  add("<div id='aqi-no-data' class='no-data-tile hidden'>🍃 Dados de qualidade do ar disponíveis após sincronizar</div><div id='aqi-grid'>");
               }
               
               add("<div class='dashboard-grid'>");
-              add("<div class='tile'><div class='tile-icon'>🍃</div><div class='tile-value' id='value-aqi'>" + String(aqi.aqi) + "</div><div class='tile-label'>" + aqi.status + " Index</div></div>");
+              add("<div class='tile'><div class='tile-icon'>🍃</div><div class='tile-value' id='value-aqi'>" + String(aqi.aqi) + "</div><div class='tile-label'>" + "Índice: " + aqi.status + "</div></div>");
               add("<div class='tile'><div class='tile-icon'>🌫️</div><div class='tile-value' id='value-pm25'>" + String(aqi.pm25, 1) + " <small>µg</small></div><div class='tile-label'>PM 2.5</div></div>");
               add("<div class='tile'><div class='tile-icon'>🏭</div><div class='tile-value' id='value-pm10'>" + String(aqi.pm10, 1) + " <small>µg</small></div><div class='tile-label'>PM 10</div></div>");
-              add("<div class='tile'><div class='tile-icon'>🧪</div><div class='tile-value' id='value-no2'>" + String(aqi.no2, 1) + " <small>µg</small></div><div class='tile-label'>Nitrogen Dioxide</div></div>");
-              add("</div><div class='update-footer' id='aqi-upd'>Last Update: " + weather.update_time + "</div></div>");
+              add("<div class='tile'><div class='tile-icon'>🧪</div><div class='tile-value' id='value-no2'>" + String(aqi.no2, 1) + " <small>µg</small></div><div class='tile-label'>Dióxido de Nitrogênio</div></div>");
+              add("</div><div class='update-footer' id='aqi-upd'>Última Atualização: " + weather.update_time + "</div></div>");
 
-              add("<label>AQI Standard:</label><div class='radio-group'>");
-              add("<label class='radio-label'><input type='radio' name='aqi_type' value='US' " + String(config.aqi_type == "US" ? "checked" : "") + "> US Standard</label>");
-              add("<label class='radio-label'><input type='radio' name='aqi_type' value='EU' " + String(config.aqi_type == "EU" ? "checked" : "") + "> European Standard</label></div>");
-              add("<p class='help-text mt-0'>EU: 0-100+ scale | US: 0-500 scale</p>");
-              add("<label class='checkbox-label'><input type='checkbox' name='aqi_hide_bar' value='1' " + String(config.aqi_hide_bar ? "checked" : "") + "> Hide Top Bar (Location & Time)</label>");
+              add("<label>Padrão de AQI:</label><div class='radio-group'>");
+              add("<label class='radio-label'><input type='radio' name='aqi_type' value='US' " + String(config.aqi_type == "US" ? "checked" : "") + "> Padrão EUA</label>");
+              add("<label class='radio-label'><input type='radio' name='aqi_type' value='EU' " + String(config.aqi_type == "EU" ? "checked" : "") + "> Padrão Europeu</label></div>");
+              add("<p class='help-text mt-0'>UE: escala 0-100+ | EUA: escala 0-500</p>");
+              add("<label class='checkbox-label'><input type='checkbox' name='aqi_hide_bar' value='1' " + String(config.aqi_hide_bar ? "checked" : "") + "> Ocultar Barra Superior (Local & Hora)</label>");
               add("</div></div>");
               break;
           }
 
           case SCREEN_DAYLIGHT: {
               add("<div class='panel' id='panel-" + String(screenId) + "'>");
-              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showDaylight' name='show_daylight' value='1' " + String(config.show_daylight ? "checked" : "") + "> Daylight Screen</label>");
+              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showDaylight' name='show_daylight' value='1' " + String(config.show_daylight ? "checked" : "") + "> Tela de Luz do Dia</label>");
               add("<div id='daylightContent' class='collapsible'>");
 
               if (!daylightValid) {
-                  add("<div id='daylight-no-data' class='no-data-tile'>☀️ Daylight data will be available after sync</div><div id='daylight-grid' class='hidden'>");
+                  add("<div id='daylight-no-data' class='no-data-tile'>☀️ Dados solares disponíveis após sincronizar</div><div id='daylight-grid' class='hidden'>");
               } else {
-                  add("<div id='daylight-no-data' class='no-data-tile hidden'>☀️ Daylight data will be available after sync</div><div id='daylight-grid'>");
+                  add("<div id='daylight-no-data' class='no-data-tile hidden'>☀️ Dados solares disponíveis após sincronizar</div><div id='daylight-grid'>");
               }
               
               add("<div class='dashboard-grid'>");
-              add("<div class='tile'><div class='tile-icon'>🌅</div><div class='tile-value' id='val-sunrise'>" + TimeService::formatMinsFromMidnight(daylight.sunrise_mins, config.time_format) + "</div><div class='tile-label'>Sunrise</div></div>");
-              add("<div class='tile'><div class='tile-icon'>🌇</div><div class='tile-value' id='val-sunset'>" + TimeService::formatMinsFromMidnight(daylight.sunset_mins, config.time_format) + "</div><div class='tile-label'>Sunset</div></div>");
-              add("<div class='tile'><div class='tile-icon'>☀️</div><div class='tile-value' id='val-noon'>" + TimeService::formatMinsFromMidnight(daylight.noon_mins, config.time_format) + "</div><div class='tile-label'>Solar Noon</div></div>");
-              add("<div class='tile'><div class='tile-icon'>⏱️</div><div class='tile-value' id='val-length'>" + TimeService::formatDurationMins(daylight.length_mins) + "</div><div class='tile-label'>Day Length</div></div>");
-              add("</div><div class='update-footer' id='daylight-upd'>Last Update: " + weather.update_time + "</div></div>");
+              add("<div class='tile'><div class='tile-icon'>🌅</div><div class='tile-value' id='val-sunrise'>" + TimeService::formatMinsFromMidnight(daylight.sunrise_mins, config.time_format) + "</div><div class='tile-label'>Nascer do Sol</div></div>");
+              add("<div class='tile'><div class='tile-icon'>🌇</div><div class='tile-value' id='val-sunset'>" + TimeService::formatMinsFromMidnight(daylight.sunset_mins, config.time_format) + "</div><div class='tile-label'>Pôr do Sol</div></div>");
+              add("<div class='tile'><div class='tile-icon'>☀️</div><div class='tile-value' id='val-noon'>" + TimeService::formatMinsFromMidnight(daylight.noon_mins, config.time_format) + "</div><div class='tile-label'>Meio-dia Solar</div></div>");
+              add("<div class='tile'><div class='tile-icon'>⏱️</div><div class='tile-value' id='val-length'>" + TimeService::formatDurationMins(daylight.length_mins) + "</div><div class='tile-label'>Duração do Dia</div></div>");
+              add("</div><div class='update-footer' id='daylight-upd'>Última Atualização: " + weather.update_time + "</div></div>");
               
-              add("<label class='checkbox-label'><input type='checkbox' name='daylight_min' value='1' " + String(config.daylight_minimal ? "checked" : "") + "> Minimalistic Mode (Hide timeline)</label>");
+              add("<label class='checkbox-label'><input type='checkbox' name='daylight_min' value='1' " + String(config.daylight_minimal ? "checked" : "") + "> Modo Minimalista (Sem linha do tempo)</label>");
               add("</div></div>");
               break;
           }
 
           case SCREEN_STOCK: {
               add("<div class='panel' id='panel-" + String(screenId) + "'>");
-              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showStock' name='show_stock' value='1' " + String(config.show_stock ? "checked" : "") + "> Stock Tracking Screen</label>");
+              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showStock' name='show_stock' value='1' " + String(config.show_stock ? "checked" : "") + "> Tela de Ações</label>");
               add("<div id='stockContent' class='collapsible'>");
               
-              add("<div id='stock-no-data' class='no-data-tile'>📈 Stock data will be available after sync</div><div id='stock-grid' class='hidden'>");
+              add("<div id='stock-no-data' class='no-data-tile'>📈 Dados de ações disponíveis após sincronizar</div><div id='stock-grid' class='hidden'>");
               add("<div class='dashboard-grid'>");
-              add("<div class='tile'><div class='tile-icon'>📊</div><div class='tile-value' id='stock-price' style='font-size:1.0rem; line-height:1.5;'>--</div><div class='tile-label'>PRICES</div></div>");
-              add("<div class='tile'><div class='tile-icon'>📈</div><div class='tile-value' id='stock-change' style='font-size:1.0rem; line-height:1.5;'>--</div><div class='tile-label'>24H CHANGE</div></div>");
-              add("</div><div class='update-footer' id='stock-upd'>Last Update: --</div></div>");
+              add("<div class='tile'><div class='tile-icon'>📊</div><div class='tile-value' id='stock-price' style='font-size:1.0rem; line-height:1.5;'>--</div><div class='tile-label'>PREÇOS</div></div>");
+              add("<div class='tile'><div class='tile-icon'>📈</div><div class='tile-value' id='stock-change' style='font-size:1.0rem; line-height:1.5;'>--</div><div class='tile-label'>VARIAÇÃO 24H</div></div>");
+              add("</div><div class='update-footer' id='stock-upd'>Última Atualização: --</div></div>");
 
               add("<div id='stock-list-container'></div>");
-              add("<button type='button' class='btn-blue' onclick='addStockRow()'>+ Add Stock / ETF</button>");
-              add("<label class='checkbox-label'><input type='checkbox' name='stock_fn' value='1' " + String(config.stock_fn ? "checked" : "") + "> Display Full Company Name</label>");
+              add("<button type='button' class='btn-blue' onclick='addStockRow()'>+ Adicionar Ação / ETF</button>");
+              add("<label class='checkbox-label'><input type='checkbox' name='stock_fn' value='1' " + String(config.stock_fn ? "checked" : "") + "> Mostrar Nome Completo da Empresa</label>");
               add("</div></div>");
               break;
           }
 
           case SCREEN_CRYPTO: {
               add("<div class='panel' id='panel-" + String(screenId) + "'>");
-              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showCrypto' name='show_crypto' value='1' " + String(config.show_crypto ? "checked" : "") + "> Crypto Tracking Screen</label>");
+              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showCrypto' name='show_crypto' value='1' " + String(config.show_crypto ? "checked" : "") + "> Tela de Criptomoedas</label>");
               add("<div id='cryptoContent' class='collapsible'>");
               
-              add("<div id='crypto-no-data' class='no-data-tile'>💰 Crypto data will be available after sync</div><div id='crypto-grid' class='hidden'>");
+              add("<div id='crypto-no-data' class='no-data-tile'>💰 Dados de cripto disponíveis após sincronizar</div><div id='crypto-grid' class='hidden'>");
               add("<div class='dashboard-grid'>");
-              add("<div class='tile'><div class='tile-icon'>₿</div><div class='tile-value' id='crypto-price' style='font-size:1.0rem; line-height:1.5;'>--</div><div class='tile-label'>PRICES</div></div>");
-              add("<div class='tile'><div class='tile-icon'>📈</div><div class='tile-value' id='crypto-change' style='font-size:1.0rem; line-height:1.5;'>--</div><div class='tile-label'>24H CHANGE</div></div>");
-              add("</div><div class='update-footer' id='crypto-upd'>Last Update: --</div></div>");
+              add("<div class='tile'><div class='tile-icon'>₿</div><div class='tile-value' id='crypto-price' style='font-size:1.0rem; line-height:1.5;'>--</div><div class='tile-label'>PREÇOS</div></div>");
+              add("<div class='tile'><div class='tile-icon'>📈</div><div class='tile-value' id='crypto-change' style='font-size:1.0rem; line-height:1.5;'>--</div><div class='tile-label'>VARIAÇÃO 24H</div></div>");
+              add("</div><div class='update-footer' id='crypto-upd'>Última Atualização: --</div></div>");
               
               add("<div id='crypto-list-container'></div>");
-              add("<button type='button' class='btn-blue' onclick='addCryptoRow()'>+ Add Cryptocurrency</button>");
-              add("<label class='checkbox-label'><input type='checkbox' name='crypto_fn' value='1' " + String(config.crypto_fn ? "checked" : "") + "> Display Full Coin Name</label>");
+              add("<button type='button' class='btn-blue' onclick='addCryptoRow()'>+ Adicionar Criptomoeda</button>");
+              add("<label class='checkbox-label'><input type='checkbox' name='crypto_fn' value='1' " + String(config.crypto_fn ? "checked" : "") + "> Mostrar Nome Completo da Cripto</label>");
               add("</div></div>");
               break;
           }
 
           case SCREEN_CURRENCY: {
               add("<div class='panel' id='panel-" + String(screenId) + "'>");
-              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showCurrency' name='show_currency' value='1' " + String(config.show_currency ? "checked" : "") + "> Currency Exchange Screen</label>");
+              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showCurrency' name='show_currency' value='1' " + String(config.show_currency ? "checked" : "") + "> Tela de Câmbio</label>");
               add("<div id='currencyContent' class='collapsible'>");
               
-              add("<div id='currency-no-data' class='no-data-tile'>💱 Currency data will be available after sync</div><div id='currency-grid' class='hidden'>");
+              add("<div id='currency-no-data' class='no-data-tile'>💱 Dados de câmbio disponíveis após sincronizar</div><div id='currency-grid' class='hidden'>");
               add("<div class='dashboard-grid'>");
               add("<div class='tile'><div class='tile-icon'>💵</div><div class='tile-value' id='currency-base-val' style='font-size:1.0rem; line-height:1.5;'>--</div><div class='tile-label'>BASE</div></div>");
-              add("<div class='tile'><div class='tile-icon'>💱</div><div class='tile-value' id='currency-target-val' style='font-size:1.0rem; line-height:1.5;'>--</div><div class='tile-label'>EXCHANGE RATE</div></div>");
-              add("</div><div class='update-footer' id='currency-upd'>Last Update: --</div></div>");
+              add("<div class='tile'><div class='tile-icon'>💱</div><div class='tile-value' id='currency-target-val' style='font-size:1.0rem; line-height:1.5;'>--</div><div class='tile-label'>TAXA DE CÂMBIO</div></div>");
+              add("</div><div class='update-footer' id='currency-upd'>Última Atualização: --</div></div>");
 
               add("<div id='currency-list-container'></div>");
-              add("<button type='button' class='btn-blue' onclick='addCurrencyRow()'>+ Add Currency Pair</button>");
-              add("<label class='checkbox-label'><input type='checkbox' name='currency_fn' value='1' " + String(config.currency_fn ? "checked" : "") + "> Display Full Currency Name</label>");
+              add("<button type='button' class='btn-blue' onclick='addCurrencyRow()'>+ Adicionar Par de Moedas</button>");
+              add("<label class='checkbox-label'><input type='checkbox' name='currency_fn' value='1' " + String(config.currency_fn ? "checked" : "") + "> Mostrar Nome Completo da Moeda</label>");
               add("</div></div>");
               break;
           }
 
           case SCREEN_PC_MONITOR: {
               add("<div class='panel' id='panel-" + String(screenId) + "'>");
-              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showPc' name='show_pc' value='1' " + String(config.show_pc ? "checked" : "") + "> PC Monitoring Screen</label>");
+              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showPc' name='show_pc' value='1' " + String(config.show_pc ? "checked" : "") + "> Tela de Monitor do PC</label>");
               add("<div id='pcContent' class='collapsible'>");
               
               if (!pcValid) {
-                  add("<div id='pc-no-data' class='no-data-tile'>🖥️ PC data will be available after sync</div><div id='pc-grid' class='hidden'>");
+                  add("<div id='pc-no-data' class='no-data-tile'>🖥️ Dados do PC disponíveis após sincronizar</div><div id='pc-grid' class='hidden'>");
               } else {
-                  add("<div id='pc-no-data' class='no-data-tile hidden'>🖥️ PC data will be available after sync</div><div id='pc-grid'>");
+                  add("<div id='pc-no-data' class='no-data-tile hidden'>🖥️ Dados do PC disponíveis após sincronizar</div><div id='pc-grid'>");
               }
               
               add("<div class='dashboard-grid'>");
-              add("<div class='tile'><div class='tile-icon'>📊</div><div class='tile-value' id='pc-cpu'>" + String((int)round(pc.cpu_percent)) + "%</div><div class='tile-label'>CPU Usage</div></div>");
-              add("<div class='tile'><div class='tile-icon'>🧠</div><div class='tile-value' id='pc-ram'>" + String((int)round(pc.mem_percent)) + "%</div><div class='tile-label'>RAM Usage</div></div>");
-              add("<div class='tile'><div class='tile-icon'>💽</div><div class='tile-value' id='pc-disk'>" + String((int)round(pc.disk_percent)) + "%</div><div class='tile-label'>Disk Usage</div></div>");
+              add("<div class='tile'><div class='tile-icon'>📊</div><div class='tile-value' id='pc-cpu'>" + String((int)round(pc.cpu_percent)) + "%</div><div class='tile-label'>Uso de CPU</div></div>");
+              add("<div class='tile'><div class='tile-icon'>🧠</div><div class='tile-value' id='pc-ram'>" + String((int)round(pc.mem_percent)) + "%</div><div class='tile-label'>Uso de RAM</div></div>");
+              add("<div class='tile'><div class='tile-icon'>💽</div><div class='tile-value' id='pc-disk'>" + String((int)round(pc.disk_percent)) + "%</div><div class='tile-label'>Uso de Disco</div></div>");
               add("<div class='tile'><div class='tile-icon'>⬇️</div><div class='tile-value' id='pc-net'>" + String((int)round(pc.net_down_kb)) + " KB/s</div><div class='tile-label'>Download</div></div>");      
               add("</div></div>");
-              add("<label class='checkbox-label'><input type='checkbox' name='hide_empty_pc' value='1' " + String(config.hide_empty_pc ? "checked" : "") + "> Hide empty screen</label>");
-              add("<p class='help-text mt-0'>Screen is excluded from rotation when there is no data.</p>");
+              add("<label class='checkbox-label'><input type='checkbox' name='hide_empty_pc' value='1' " + String(config.hide_empty_pc ? "checked" : "") + "> Ocultar tela vazia</label>");
+              add("<p class='help-text mt-0'>A tela sai da rotação quando não há dados.</p>");
               add("</div></div>");
               break;
           }
 
           case SCREEN_PC_MEDIA: {
               add("<div class='panel' id='panel-" + String(screenId) + "'>");
-              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showMedia' name='show_media' value='1' " + String(config.show_media ? "checked" : "") + "> PC Media Screen</label>");
+              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showMedia' name='show_media' value='1' " + String(config.show_media ? "checked" : "") + "> Tela de Mídia do PC</label>");
               add("<div id='mediaContent' class='collapsible'>");
 
               bool isMediaValid = (media.name.length() > 0 && media.author.length() > 0);
               if (!isMediaValid) {
-                  add("<div id='media-no-data' class='no-data-tile'>🎵 Media data will be available after sync and/or when media is played</div><div id='media-grid' class='hidden'>");
+                  add("<div id='media-no-data' class='no-data-tile'>🎵 Dados de mídia disponíveis após sincronizar e/ou quando algo estiver tocando</div><div id='media-grid' class='hidden'>");
               } else {
-                  add("<div id='media-no-data' class='no-data-tile hidden'>🎵 Media data will be available after sync and/or when media is played</div><div id='media-grid'>");
+                  add("<div id='media-no-data' class='no-data-tile hidden'>🎵 Dados de mídia disponíveis após sincronizar e/ou quando algo estiver tocando</div><div id='media-grid'>");
               }
 
               add("<div class='dashboard-grid'>");
               add("<div class='tile'><div class='tile-icon'>🎵</div><div class='tile-value' id='web-media-status' style='font-size:1.2rem'>" + media.status + "</div><div class='tile-label'>Status</div></div>");
-              add("<div class='tile'><div class='tile-icon'>🎧</div><div class='tile-value' id='web-media-name' style='font-size:1.2rem'>" + media.name + "</div><div class='tile-label'>Track</div></div>");
-              add("<div class='tile'><div class='tile-icon'>👤</div><div class='tile-value' id='web-media-author' style='font-size:1.2rem'>" + media.author + "</div><div class='tile-label'>Author</div></div>");
-              add("<div class='tile'><div class='tile-icon'>💿</div><div class='tile-value' id='web-media-album' style='font-size:1.2rem'>" + media.album + "</div><div class='tile-label'>Album</div></div>");
+              add("<div class='tile'><div class='tile-icon'>🎧</div><div class='tile-value' id='web-media-name' style='font-size:1.2rem'>" + media.name + "</div><div class='tile-label'>Faixa</div></div>");
+              add("<div class='tile'><div class='tile-icon'>👤</div><div class='tile-value' id='web-media-author' style='font-size:1.2rem'>" + media.author + "</div><div class='tile-label'>Artista</div></div>");
+              add("<div class='tile'><div class='tile-icon'>💿</div><div class='tile-value' id='web-media-album' style='font-size:1.2rem'>" + media.album + "</div><div class='tile-label'>Álbum</div></div>");
               add("</div></div>");
-              add("<label class='checkbox-label'><input type='checkbox' name='hide_empty_media' value='1' " + String(config.hide_empty_media ? "checked" : "") + "> Hide empty screen</label>");
-              add("<p class='help-text mt-0'>Screen is excluded from rotation when there is no data.</p>");
+              add("<label class='checkbox-label'><input type='checkbox' name='hide_empty_media' value='1' " + String(config.hide_empty_media ? "checked" : "") + "> Ocultar tela vazia</label>");
+              add("<p class='help-text mt-0'>A tela sai da rotação quando não há dados.</p>");
               add("</div></div>");
               break;
           }
 
           case SCREEN_BAMBU: {
               add("<div class='panel' id='panel-" + String(screenId) + "'>");
-              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showBambu' name='show_bambu' value='1' " + String(config.show_bambu ? "checked" : "") + "> Bambu 3D Printer Screen</label>");
+              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showBambu' name='show_bambu' value='1' " + String(config.show_bambu ? "checked" : "") + "> Tela da Impressora 3D Bambu</label>");
               add("<div id='bambuContent' class='collapsible'>");
               
               bool isBambuKnown = (state->bambu.status != "SYNCING");
               if (!isBambuKnown) {
-                  add("<div id='bambu-no-data' class='no-data-tile'>🖨️ Printer data will be available after connection is established</div><div id='bambu-grid' class='hidden'>");
+                  add("<div id='bambu-no-data' class='no-data-tile'>🖨️ Dados da impressora disponíveis após estabelecer conexão</div><div id='bambu-grid' class='hidden'>");
               } else {
-                  add("<div id='bambu-no-data' class='no-data-tile hidden'>🖨️ Printer data will be available after connection is established</div><div id='bambu-grid'>");
+                  add("<div id='bambu-no-data' class='no-data-tile hidden'>🖨️ Dados da impressora disponíveis após estabelecer conexão</div><div id='bambu-grid'>");
               }
               
               add("<div class='dashboard-grid'>");
               add("<div class='tile'><div class='tile-icon'>🖨️</div><div class='tile-value' id='bambu-status' style='font-size:1.2rem'>" + state->bambu.status + "</div><div class='tile-label'>Status</div></div>");
-              add("<div class='tile'><div class='tile-icon'>⏳</div><div class='tile-value' id='bambu-prog' style='font-size:1.1rem'>" + String(state->bambu.progress) + "% | " + String(state->bambu.time_left) + "m<br><span style='font-size:0.9rem'>Layers: " + String(state->bambu.layer) + "/" + String(state->bambu.total_layers) + "</span></div><div class='tile-label'>Progress</div></div>");
-              add("<div class='tile'><div class='tile-icon'>🌡️</div><div class='tile-value' id='bambu-temps' style='font-size:1.1rem'>Nozzle: " + String(state->bambu.nozzle_temp, 1) + "/" + String(state->bambu.nozzle_target, 1) + "<br>Bed: " + String(state->bambu.bed_temp, 1) + "/" + String(state->bambu.bed_target, 1) + "</div><div class='tile-label'>Temperatures</div></div>");
-              add("<div class='tile'><div class='tile-icon'>💨</div><div class='tile-value' id='bambu-fans' style='font-size:1.2rem'>Part: " + String(state->bambu.fan_part) + " | Aux: " + String(state->bambu.fan_aux) + "</div><div class='tile-label'>Fans</div></div>");
+              add("<div class='tile'><div class='tile-icon'>⏳</div><div class='tile-value' id='bambu-prog' style='font-size:1.1rem'>" + String(state->bambu.progress) + "% | " + String(state->bambu.time_left) + "m<br><span style='font-size:0.9rem'>Camadas: " + String(state->bambu.layer) + "/" + String(state->bambu.total_layers) + "</span></div><div class='tile-label'>Progresso</div></div>");
+              add("<div class='tile'><div class='tile-icon'>🌡️</div><div class='tile-value' id='bambu-temps' style='font-size:1.1rem'>Bico: " + String(state->bambu.nozzle_temp, 1) + "/" + String(state->bambu.nozzle_target, 1) + "<br>Mesa: " + String(state->bambu.bed_temp, 1) + "/" + String(state->bambu.bed_target, 1) + "</div><div class='tile-label'>Temperaturas</div></div>");
+              add("<div class='tile'><div class='tile-icon'>💨</div><div class='tile-value' id='bambu-fans' style='font-size:1.2rem'>Peça: " + String(state->bambu.fan_part) + " | Aux: " + String(state->bambu.fan_aux) + "</div><div class='tile-label'>Ventoinhas</div></div>");
               add("</div></div>");
 
-              add("<label class='checkbox-label'><input type='checkbox' name='hide_empty_bambu' value='1' " + String(config.hide_empty_bambu ? "checked" : "") + "> Hide empty screen</label>");
-              add("<p class='help-text mt-0'>Screen is excluded from rotation when printer is offline.</p>");
+              add("<label class='checkbox-label'><input type='checkbox' name='hide_empty_bambu' value='1' " + String(config.hide_empty_bambu ? "checked" : "") + "> Ocultar tela vazia</label>");
+              add("<p class='help-text mt-0'>A tela sai da rotação quando a impressora está offline.</p>");
 
-              add("<label>Printer IP Address:</label><input type='text' name='bambu_ip' placeholder='e.g. 192.168.0.100' value='" + config.bambu_ip + "'>");
-              add("<label>Printer Serial Number:</label><input type='text' name='bambu_sn' placeholder='e.g. 00M...' value='" + config.bambu_sn + "'>");
-              add("<label>Printer Access Code:</label><input type='text' name='bambu_code' placeholder='e.g. 1234abcd' value='" + config.bambu_code + "'>");
+              add("<label>IP da Impressora:</label><input type='text' name='bambu_ip' placeholder='ex: 192.168.0.100' value='" + config.bambu_ip + "'>");
+              add("<label>Número de Série da Impressora:</label><input type='text' name='bambu_sn' placeholder='ex: 00M...' value='" + config.bambu_sn + "'>");
+              add("<label>Código de Acesso da Impressora:</label><input type='text' name='bambu_code' placeholder='ex: 1234abcd' value='" + config.bambu_code + "'>");
               add("</div></div>");
               break;
           }
@@ -556,7 +556,7 @@ void WebServerService::handleRoot() {
   }
 
   add("</div>");
-  add("<button type='submit'>💾 Save & Apply All Settings</button></form>");
+  add("<button type='submit'>💾 Salvar & Aplicar Tudo</button></form>");
   
   add("<script>");
   add("let formDirty = false;");
@@ -600,11 +600,11 @@ void WebServerService::handleRoot() {
 
   add("window.addStockRow = function(val = null) { const container = document.getElementById('stock-list-container'); if (!container || container.children.length >= 5) return; const div = document.createElement('div'); div.className = 'multi-row'; let opts = ''; ");
   for(auto s : topStocks) { add("opts += `<option value='" + String(s.ticker) + "'>" + String(s.name) + " - " + String(s.ticker) + "</option>`;"); }
-  add("div.innerHTML = `<div class='input-wrapper'><label class='mt-0'>Track Stock:</label><select name='stock_symbols[]'>${opts}</select></div><button type='button' class='btn-remove' onclick=\"removeRow(this, 'stock-list-container')\">-</button>`; container.appendChild(div); if (val) div.querySelector('select').value = val; formDirty = true; updateRowControls('stock-list-container', 5); };");
+  add("div.innerHTML = `<div class='input-wrapper'><label class='mt-0'>Ação:</label><select name='stock_symbols[]'>${opts}</select></div><button type='button' class='btn-remove' onclick=\"removeRow(this, 'stock-list-container')\">-</button>`; container.appendChild(div); if (val) div.querySelector('select').value = val; formDirty = true; updateRowControls('stock-list-container', 5); };");
 
   add("window.addCryptoRow = function(val = null) { const container = document.getElementById('crypto-list-container'); if (!container || container.children.length >= 5) return; const div = document.createElement('div'); div.className = 'multi-row'; let opts = ''; ");
   for(auto c : topCoins) { add("opts += `<option value='" + String(c.id) + "'>" + String(c.sym) + "</option>`;"); }
-  add("div.innerHTML = `<div class='input-wrapper'><label class='mt-0'>Track Crypto:</label><select name='crypto_ids[]'>${opts}</select></div><button type='button' class='btn-remove' onclick=\"removeRow(this, 'crypto-list-container')\">-</button>`; container.appendChild(div); if (val) div.querySelector('select').value = val; formDirty = true; updateRowControls('crypto-list-container', 5); };");
+  add("div.innerHTML = `<div class='input-wrapper'><label class='mt-0'>Cripto:</label><select name='crypto_ids[]'>${opts}</select></div><button type='button' class='btn-remove' onclick=\"removeRow(this, 'crypto-list-container')\">-</button>`; container.appendChild(div); if (val) div.querySelector('select').value = val; formDirty = true; updateRowControls('crypto-list-container', 5); };");
 
   add("window.addCurrencyRow = function(bVal = null, tVal = null, mVal = null) { const container = document.getElementById('currency-list-container'); if (!container || container.children.length >= 5) return; const div = document.createElement('div'); div.className = 'multi-row'; let cOpts = ''; ");
   for(auto c : allCurrencies) { 
@@ -612,7 +612,7 @@ void WebServerService::handleRoot() {
     codeStr.toUpperCase();
     add("cOpts += `<option value='" + String(c.code) + "'>" + codeStr + "</option>`;"); 
   }
-  add("div.innerHTML = `<div class='input-wrapper'><label class='mt-0'>Base:</label><select name='currency_bases[]'>${cOpts}</select></div><div class='input-wrapper'><label class='mt-0'>Target:</label><select name='currency_targets[]'>${cOpts}</select></div><div class='input-wrapper'><label class='mt-0'>Mult:</label><select name='currency_multipliers[]'><option value='1'>1</option><option value='10'>10</option><option value='100'>100</option><option value='1000'>1000</option></select></div><button type='button' class='btn-remove' onclick=\"removeRow(this, 'currency-list-container')\">-</button>`; container.appendChild(div); if (bVal) div.querySelector(\"select[name='currency_bases[]']\").value = bVal; if (tVal) div.querySelector(\"select[name='currency_targets[]']\").value = tVal; if (mVal) div.querySelector(\"select[name='currency_multipliers[]']\").value = mVal; formDirty = true; updateRowControls('currency-list-container', 5); };");
+  add("div.innerHTML = `<div class='input-wrapper'><label class='mt-0'>Base:</label><select name='currency_bases[]'>${cOpts}</select></div><div class='input-wrapper'><label class='mt-0'>Destino:</label><select name='currency_targets[]'>${cOpts}</select></div><div class='input-wrapper'><label class='mt-0'>Mult:</label><select name='currency_multipliers[]'><option value='1'>1</option><option value='10'>10</option><option value='100'>100</option><option value='1000'>1000</option></select></div><button type='button' class='btn-remove' onclick=\"removeRow(this, 'currency-list-container')\">-</button>`; container.appendChild(div); if (bVal) div.querySelector(\"select[name='currency_bases[]']\").value = bVal; if (tVal) div.querySelector(\"select[name='currency_targets[]']\").value = tVal; if (mVal) div.querySelector(\"select[name='currency_multipliers[]']\").value = mVal; formDirty = true; updateRowControls('currency-list-container', 5); };");
 
   add("['autoDetect', 'nightMode', 'showTime', 'showCalendar', 'showWeather', 'showDaylight', 'showPc', 'showCrypto', 'showCurrency', 'showStock', 'showAQI', 'showMedia', 'showBambu', 'autoCycle'].forEach(id => { var el=document.getElementById(id); if(el) el.addEventListener('change', updateVisibility); });");
   add("updateVisibility();");
@@ -774,26 +774,26 @@ void WebServerService::handleRoot() {
   add("  jsonObj['screen_order'] = document.getElementById('screenOrderInput').value;");
 
   add("  const btn = document.querySelector('button[type=\"submit\"]');");
-  add("  btn.innerText = '⏳ Saving...';");
+  add("  btn.innerText = '⏳ Salvando...';");
   add("  btn.style.opacity = '0.7';");
   add("  btn.disabled = true;");
   
   add("  fetch('/save', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(jsonObj) })");
   add("    .then(r => {");
   add("      if (r.ok) {");
-  add("        btn.innerText = '✅ Saved Successfully!';");
+  add("        btn.innerText = '✅ Salvo com Sucesso!';");
   add("        btn.style.backgroundColor = 'var(--text-main)';");
   add("        formDirty = false;");
   add("        setTimeout(updateData, 1000);");
   add("      } else { throw new Error('Backend Error'); }");
   add("    })");
   add("    .catch(e => {");
-  add("      btn.innerText = '❌ Failed to Save';");
+  add("      btn.innerText = '❌ Falha ao Salvar';");
   add("      btn.style.backgroundColor = 'var(--text-main)';");
   add("    })");
   add("    .finally(() => {");
   add("      setTimeout(() => {");
-  add("        btn.innerText = '💾 Save & Apply All Settings';");
+  add("        btn.innerText = '💾 Salvar & Aplicar Tudo';");
   add("        btn.style.backgroundColor = 'var(--primary-main)';");
   add("        btn.style.opacity = '1';");
   add("        btn.disabled = false;");
@@ -905,7 +905,7 @@ void WebServerService::handleRoot() {
   add("  set('preview-date', d.date);");
 
   add("  set('preview-tz', d.timezone);");
-  add("  if (d.cal_count !== undefined) { set('preview-hol', d.cal_count > 0 ? d.cal_count : 'No holiday data'); }");
+  add("  if (d.cal_count !== undefined) { set('preview-hol', d.cal_count > 0 ? d.cal_count : 'Sem feriados'); }");
 
   add("  updateLiveHeader();");
 
@@ -915,17 +915,17 @@ void WebServerService::handleRoot() {
   add("    set('value-feels', d.apparent_temperature + ' °' + d.temp_unit);");
   add("    set('value-hum', d.humidity + '%');");
   add("    set('value-wind', d.wind_speed + ' km/h');");
-  add("    set('weather-upd', 'Last Update: ' + d.update_time);");
+  add("    set('weather-upd', 'Última Atualização: ' + d.update_time);");
   add("  } else { hide('weather-no-data', false); hide('weather-grid', true); }");
 
   add("  if (d.aqi !== undefined && d.aqi !== 'nan') {");
   add("    if (!set('value-aqi', d.aqi)) { location.reload(); return; }");
   add("    hide('aqi-no-data', true); hide('aqi-grid', false);");
-  add("    const aqiLabel = document.querySelector('#value-aqi + .tile-label'); if(aqiLabel) aqiLabel.innerText = d.aqi_status + ' Index';"); 
+  add("    const aqiLabel = document.querySelector('#value-aqi + .tile-label'); if(aqiLabel) aqiLabel.innerText = 'Índice: ' + d.aqi_status;"); 
   add("    set('value-pm25', d.pm25 + ' <small>µg</small>', true);");
   add("    set('value-pm10', d.pm10 + ' <small>µg</small>', true);");
   add("    set('value-no2', d.no2 + ' <small>µg</small>', true);");
-  add("    set('aqi-upd', 'Last Update: ' + d.update_time);");
+  add("    set('aqi-upd', 'Última Atualização: ' + d.update_time);");
   add("  } else { hide('aqi-no-data', false); hide('aqi-grid', true); }");
 
   add("  if (d.sunrise !== undefined) {");
@@ -934,25 +934,25 @@ void WebServerService::handleRoot() {
   add("    set('val-sunset', d.sunset);");
   add("    set('val-noon', d.solar_noon);");
   add("    set('val-length', d.day_length);");
-  add("    set('daylight-upd', 'Last Update: ' + d.update_time);");
+  add("    set('daylight-upd', 'Última Atualização: ' + d.update_time);");
   add("  } else { hide('daylight-no-data', false); hide('daylight-grid', true); }");
 
   add("  if (d.stock_data && d.stock_data.length > 0) {");
   add("    hide('stock-no-data', true); hide('stock-grid', false); let p='', c='';");
   add("    d.stock_data.forEach(s => { p += s.symbol + ': $' + s.price + '<br>'; c += (parseFloat(s.change) >= 0 ? '+' : '') + s.change + '%<br>'; });");
-  add("    set('stock-price', p, true); set('stock-change', c, true); set('stock-upd', 'Last Update: ' + d.update_time);");
+  add("    set('stock-price', p, true); set('stock-change', c, true); set('stock-upd', 'Última Atualização: ' + d.update_time);");
   add("  } else { hide('stock-no-data', false); hide('stock-grid', true); }");
 
   add("  if (d.crypto_data && d.crypto_data.length > 0) {");
   add("    hide('crypto-no-data', true); hide('crypto-grid', false); let p='', c='';");
   add("    d.crypto_data.forEach(s => { p += s.symbol + ': $' + s.price + '<br>'; c += (parseFloat(s.change) >= 0 ? '+' : '') + s.change + '%<br>'; });");
-  add("    set('crypto-price', p, true); set('crypto-change', c, true); set('crypto-upd', 'Last Update: ' + d.update_time);");
+  add("    set('crypto-price', p, true); set('crypto-change', c, true); set('crypto-upd', 'Última Atualização: ' + d.update_time);");
   add("  } else { hide('crypto-no-data', false); hide('crypto-grid', true); }");
 
   add("  if (d.currency_data && d.currency_data.length > 0) {");
   add("    hide('currency-no-data', true); hide('currency-grid', false); let b='', t='';");
   add("    d.currency_data.forEach(s => { b += s.base_text + '<br>'; t += s.target_text + '<br>'; });");
-  add("    set('currency-base-val', b, true); set('currency-target-val', t, true); set('currency-upd', 'Last Update: ' + d.update_time);");
+  add("    set('currency-base-val', b, true); set('currency-target-val', t, true); set('currency-upd', 'Última Atualização: ' + d.update_time);");
   add("  } else { hide('currency-no-data', false); hide('currency-grid', true); }");
 
   add("  if (d.pc_cpu !== undefined && d.pc_cpu !== '0.00' && d.pc_cpu !== '0') {");
@@ -969,15 +969,15 @@ void WebServerService::handleRoot() {
   add("    set('web-media-status', s.charAt(0).toUpperCase() + s.slice(1));");
   add("    set('web-media-name', d.media_name);");
   add("    set('web-media-author', d.media_author);");
-  add("    set('web-media-album', d.media_album || 'Unknown');");
+  add("    set('web-media-album', d.media_album || 'Desconhecido');");
   add("  } else { hide('media-no-data', false); hide('media-grid', true); }");
 
   add("  if (d.bambu_status !== undefined) {");
   add("    hide('bambu-no-data', true); hide('bambu-grid', false);");
   add("    set('bambu-status', d.bambu_status);");
-  add("    set('bambu-prog', d.bambu_progress + '% | ' + d.bambu_time + 'm<br><span style=\"font-size:0.9rem\">Layer: ' + d.bambu_layer + '/' + d.bambu_total_layers + '</span>', true);");
-  add("    set('bambu-temps', 'Nozzle: ' + parseFloat(d.bambu_nozzle).toFixed(1) + '/' + parseFloat(d.bambu_nozzle_target).toFixed(1) + '<br>Bed: ' + parseFloat(d.bambu_bed).toFixed(1) + '/' + parseFloat(d.bambu_bed_target).toFixed(1), true);");
-  add("    set('bambu-fans', 'Part: ' + d.bambu_fan_part + ' | Aux: ' + d.bambu_fan_aux);");
+  add("    set('bambu-prog', d.bambu_progress + '% | ' + d.bambu_time + 'm<br><span style=\"font-size:0.9rem\">Camada: ' + d.bambu_layer + '/' + d.bambu_total_layers + '</span>', true);");
+  add("    set('bambu-temps', 'Bico: ' + parseFloat(d.bambu_nozzle).toFixed(1) + '/' + parseFloat(d.bambu_nozzle_target).toFixed(1) + '<br>Mesa: ' + parseFloat(d.bambu_bed).toFixed(1) + '/' + parseFloat(d.bambu_bed_target).toFixed(1), true);");
+  add("    set('bambu-fans', 'Peça: ' + d.bambu_fan_part + ' | Aux: ' + d.bambu_fan_aux);");
   add("  } else { hide('bambu-no-data', false); hide('bambu-grid', true); }");
   
   add("  if (d.pc_status !== undefined) set('pc-link-status', d.pc_status);");
