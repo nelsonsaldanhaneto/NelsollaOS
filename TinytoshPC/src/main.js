@@ -952,7 +952,7 @@ async function fetchDeviceData() {
                 const b3 = s.symbol.endsWith(".SA"); const sym = b3 ? s.symbol.slice(0, -3) : s.symbol; const cur = b3 ? "R$" : "$";
                 pStr += sym + ": " + cur + s.price + "<br>"; 
                 const v = (s.gain !== undefined) ? s.gain : s.change;
-                cStr += (parseFloat(v) >= 0 ? "+" : "") + v + "%" + (s.pos_value !== undefined ? " (" + cur + Math.round(s.pos_value) + ")" : "") + "<br>"; 
+                cStr += (parseFloat(v) >= 0 ? "+" : "") + v + "%<br>"; 
             });
             set('stock-price', pStr, true); set('stock-change', cStr, true); set('stock-upd', 'Última Atualização: ' + d.update_time);
         } else {

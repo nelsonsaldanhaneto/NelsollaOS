@@ -157,7 +157,6 @@ String JsonSerializer::buildAppStateJson(const AppState& state) {
             if (state.config.stock_avgs[i] > 0 && state.stocks[i].price > 0) {
                 float gain = ((state.stocks[i].price - state.config.stock_avgs[i]) / state.config.stock_avgs[i]) * 100.0f;
                 obj["gain"] = String(gain, 2);
-                obj["pos_value"] = String(state.config.stock_qtys[i] * state.stocks[i].price, 2);
             }
         }
     }

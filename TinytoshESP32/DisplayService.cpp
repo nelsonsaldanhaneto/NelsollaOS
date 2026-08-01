@@ -815,11 +815,10 @@ void DisplayService::drawStockScreen(const Config& config, const StockData& data
 
     // Registered position for this symbol? Then the trend shown is the owner's
     // return over their average price, not the daily change.
-    float avgPrice = 0, qty = 0;
+    float avgPrice = 0;
     for (int i = 0; i < config.stock_count; i++) {
         if (config.stock_symbols[i] == data.symbol) {
             avgPrice = config.stock_avgs[i];
-            qty = config.stock_qtys[i];
             break;
         }
     }
@@ -852,8 +851,7 @@ void DisplayService::drawStockScreen(const Config& config, const StockData& data
 
     display.drawFastHLine(0, 13, 128, SSD1306_WHITE);
 
-    // 2. Blue area: symbol and price, plus the position's current value when
-    // a quantity is registered.
+    // 2. Blue area: symbol and price
     display.setTextSize(3);
     display.setCursor(4, 20);
     display.print(displaySymbol);
@@ -861,14 +859,6 @@ void DisplayService::drawStockScreen(const Config& config, const StockData& data
     display.setTextSize(2);
     display.setCursor(4, 46);
     display.print(currencyPrefix + String(data.price));
-
-    if (personal && qty > 0) {
-        display.setTextSize(1);
-        String posStr = currencyPrefix + String((int)round(qty * data.price));
-        display.getTextBounds(posStr.c_str(), 0, 0, &x1, &y1, &w, &h);
-        display.setCursor(124 - w, 52);
-        display.print(posStr);
-    }
 }
 
 void DisplayService::drawPcScreen(const PcStats& pcStats) {
