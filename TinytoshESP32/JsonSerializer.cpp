@@ -81,6 +81,9 @@ void JsonSerializer::populateConfigDoc(const Config& config, DynamicJsonDocument
     JsonArray cmArr = doc.createNestedArray("currency_multipliers");
     for(int i=0; i<config.currency_count; i++) cmArr.add(config.currency_multipliers[i]);
 
+    doc["show_cellairis"] = config.show_cellairis ? 1 : 0;
+    doc["cellairis_token"] = config.cellairis_token;
+
     doc["show_bambu"] = config.show_bambu ? 1 : 0;
     doc["bambu_ip"] = config.bambu_ip;
     doc["bambu_sn"] = config.bambu_sn;
@@ -180,6 +183,15 @@ String JsonSerializer::buildAppStateJson(const AppState& state) {
             obj["base_text"] = String(state.config.currency_multipliers[i]) + " " + state.currencies[i].base;
             obj["target_text"] = String(displayRate, decimals) + " " + state.currencies[i].target;
         }
+    }
+
+    if (state.cellairis.updated) {
+        doc["cell_faturado"] = String(state.cellairis.faturado, 0);
+        doc["cell_projecao"] = String(state.cellairis.projecao, 0);
+        doc["cell_meta"] = String(state.cellairis.meta, 0);
+        doc["cell_pct"] = String(state.cellairis.pct, 1);
+        doc["cell_proj_pct"] = String(state.cellairis.proj_pct, 1);
+        doc["cell_mes"] = state.cellairis.mes;
     }
 
     if (state.pc.cpu_percent > 0.1) {
@@ -357,6 +369,9 @@ bool JsonSerializer::parseConfig(const char* jsonString, AppState& state) {
     if (doc.containsKey("bambu_code")) config.bambu_code = doc["bambu_code"].as<String>();
     
     if (doc.containsKey("hide_empty_pc")) config.hide_empty_pc = doc["hide_empty_pc"] == 1;
+    if (doc.containsKey("show_cellairis")) config.show_cellairis = doc["show_cellairis"] == 1;
+    if (doc.containsKey("cellairis_token")) config.cellairis_token = doc["cellairis_token"].as<String>();
+
     if (doc.containsKey("hide_empty_media")) config.hide_empty_media = doc["hide_empty_media"] == 1;
     if (doc.containsKey("hide_empty_bambu")) config.hide_empty_bambu = doc["hide_empty_bambu"] == 1;
 
@@ -371,6 +386,21 @@ bool JsonSerializer::parseConfig(const char* jsonString, AppState& state) {
                 config.screen_order[idx++] = orderStr.substring(startPos, commaPos).toInt(); startPos = commaPos + 1;
             }
         }
+
+        // Migration: an order saved before a screen existed (NVS from an older
+        // firmware, or a PC app that doesn't know it yet) would orphan the new
+        // screen forever. Rebuild dropping invalid/duplicate ids, then append
+        // any missing screens at the end.
+        bool seen[NUM_SCREENS] = {false};
+        int cleaned[NUM_SCREENS]; int n = 0;
+        for (int i = 0; i < idx; i++) {
+            int id = config.screen_order[i];
+            if (id >= 0 && id < NUM_SCREENS && !seen[id]) { seen[id] = true; cleaned[n++] = id; }
+        }
+        for (int id = 0; id < NUM_SCREENS; id++) {
+            if (!seen[id]) cleaned[n++] = id;
+        }
+        for (int i = 0; i < NUM_SCREENS; i++) config.screen_order[i] = cleaned[i];
     }
 
     // Dynamic State Wipes (Triggers data reload)
@@ -381,6 +411,7 @@ bool JsonSerializer::parseConfig(const char* jsonString, AppState& state) {
     if (!config.show_aqi) { state.aqi.aqi = NAN; state.aqi.pm25 = NAN; state.aqi.pm10 = NAN; state.aqi.no2 = NAN; }
     if (!config.show_daylight) { state.daylight.sunrise_mins = -1; state.daylight.sunset_mins = -1; state.daylight.noon_mins = -1; state.daylight.length_mins = -1; state.daylight.last_fetch_yday = -1; }
     if (!config.show_pc) { state.pc.cpu_percent = 0; state.pc.net_down_kb = 0; state.pc.mem_percent = 0; state.pc.disk_percent = 0; }
+    if (!config.show_cellairis) { state.cellairis.updated = false; state.cellairis.faturado = -1; }
     
     // Array Wipes
     if (!config.show_crypto) { 

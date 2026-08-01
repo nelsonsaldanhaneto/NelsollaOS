@@ -18,6 +18,7 @@
 #include "StockService.h"
 #include "PcMonitorService.h"
 #include "BambuService.h"
+#include "CellairisService.h"
 
 // Global Constants
 const char* AP_SSID = "NelsollaOS";
@@ -64,6 +65,7 @@ CurrencyService currencyService;
 StockService stockService;
 PcMonitorService pcMonitorService;
 BambuService bambuService;
+CellairisService cellairisService;
 
 unsigned long lastScreenSwitch = 0;
 int currentScreen = 0;
@@ -342,6 +344,12 @@ void updateAllData() {
       displayService.showOLEDStatus({"\n", "\n", "Atualizando Moedas...", "\n", "Par:", baseUpper + " -> " + targetUpper}, true);
       currencyService.fetchRate(appState.config.currency_bases[i], appState.config.currency_targets[i], appState.currencies[i]);
     }
+  }
+
+  // 10. Fetch Cellairis (Independent)
+  if (appState.config.show_cellairis) {
+    displayService.showOLEDStatus({"\n", "\n", "Atualizando Cellairis...", "\n", "Faturamento do mes"}, true);
+    cellairisService.fetchSummary(appState.config, appState.cellairis);
   }
 
   displayService.showOLEDStatus({"\n", "\n", "Dados Atualizados", "\n", "\n", "NelsollaOS Pronto", "\n", "\n", "Bem-vindo!"}, true);

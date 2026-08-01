@@ -638,7 +638,7 @@ function updateVisibility() {
       ['showDaylight', 'daylightContent', false],
       ['showStock','stockContent',false], ['showCrypto','cryptoContent',false], 
       ['showCurrency','currencyContent',false], ['showPc','pcContent',false], 
-      ['showMedia', 'mediaContent', false], ['showBambu', 'bambuContent', false]
+      ['showMedia', 'mediaContent', false], ['showBambu', 'bambuContent', false], ['showCellairis', 'cellairisContent', false]
   ];
   pairs.forEach(p => {
     var ch = document.getElementById(p[0]); if(!ch) return;
@@ -849,6 +849,8 @@ async function fetchDeviceData() {
 
             setCb('showMedia', d.show_media);
             setCb('showBambu', d.show_bambu);
+            setCb('showCellairis', d.show_cellairis);
+            setVal('cellairis_token', d.cellairis_token);
             setVal('bambu_ip', d.bambu_ip);
             setVal('bambu_sn', d.bambu_sn);
             setVal('bambu_code', d.bambu_code);
@@ -1019,6 +1021,18 @@ async function fetchDeviceData() {
             let gr = document.getElementById('media-grid'); if(gr) gr.classList.add('hidden');
         }
 
+        if (d.cell_faturado !== undefined) {
+            let nd = document.getElementById('cell-no-data'); if(nd) nd.style.display = 'none';
+            let gr = document.getElementById('cell-grid'); if(gr) gr.classList.remove('hidden');
+            set('cell-faturado', 'R$ ' + Number(d.cell_faturado).toLocaleString('pt-BR'));
+            set('cell-projecao', 'R$ ' + Number(d.cell_projecao).toLocaleString('pt-BR'));
+            set('cell-meta', 'R$ ' + Number(d.cell_meta).toLocaleString('pt-BR'));
+            set('cell-pct', d.cell_pct + '%');
+        } else {
+            let nd = document.getElementById('cell-no-data'); if(nd) nd.style.display = 'block';
+            let gr = document.getElementById('cell-grid'); if(gr) gr.classList.add('hidden');
+        }
+
         if (d.bambu_status !== undefined) {
             let nd = document.getElementById('bambu-no-data'); if(nd) nd.style.display = 'none';
             let gr = document.getElementById('bambu-grid'); if(gr) gr.classList.remove('hidden');
@@ -1140,7 +1154,7 @@ window.addEventListener("DOMContentLoaded", () => {
     setInterval(fetchDeviceData, HARDWARE_SYNC_INTERVAL_MS); 
     setTimeout(fetchDeviceData, INITIAL_SYNC_DELAY_MS); 
 
-    ['autoDetect', 'nightMode', 'showTime', 'showCalendar', 'showWeather', 'showDaylight', 'showPc', 'showCrypto', 'showCurrency', 'showStock', 'showAQI', 'showMedia', 'showBambu', 'autoCycle'].forEach(id => { 
+    ['autoDetect', 'nightMode', 'showTime', 'showCalendar', 'showWeather', 'showDaylight', 'showPc', 'showCrypto', 'showCurrency', 'showStock', 'showAQI', 'showMedia', 'showBambu', 'showCellairis', 'autoCycle'].forEach(id => { 
         var el = document.getElementById(id); 
         if(el) el.addEventListener('change', () => { updateVisibility(); syncScreenOrder(true); }); 
     });

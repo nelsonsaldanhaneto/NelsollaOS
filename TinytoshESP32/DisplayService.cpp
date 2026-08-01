@@ -1205,6 +1205,70 @@ void DisplayService::drawBambuScreen(const BambuData& data) {
     display.print(timeStr);
 }
 
+// "45230" -> "45.230" (separador de milhar PT-BR, sem centavos: e um painel
+// de parede, nao um contracheque).
+static String fmtMilharBR(long v) {
+    String raw = String(v);
+    bool neg = raw.startsWith("-");
+    if (neg) raw = raw.substring(1);
+    String out;
+    int len = raw.length();
+    for (int i = 0; i < len; i++) {
+        if (i > 0 && (len - i) % 3 == 0) out += '.';
+        out += raw[i];
+    }
+    return (neg ? "-" : "") + out;
+}
+
+void DisplayService::drawCellairisScreen(const Config& config, const CellairisData& data) {
+    if (!data.updated || data.faturado < 0) {
+        drawInfoScreen(nullptr, "Sem Dados Cellairis");
+        return;
+    }
+
+    display.clearDisplay();
+    display.setTextColor(SSD1306_WHITE);
+    display.setTextWrap(false);
+    display.setFont();
+
+    int16_t x1, y1; uint16_t w, h;
+
+    // Yellow band: store name + month
+    static const char* MESES_CELL[] = {"JAN", "FEV", "MAR", "ABR", "MAI", "JUN",
+                                       "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"};
+    display.setTextSize(1);
+    display.setCursor(4, 3);
+    display.print("CELLAIRIS");
+
+    int monIdx = data.mes.length() >= 7 ? data.mes.substring(5, 7).toInt() - 1 : -1;
+    if (monIdx >= 0 && monIdx < 12) {
+        display.getTextBounds(MESES_CELL[monIdx], 0, 0, &x1, &y1, &w, &h);
+        display.setCursor(124 - w, 3);
+        display.print(MESES_CELL[monIdx]);
+    }
+    display.drawFastHLine(0, 13, 128, SSD1306_WHITE);
+
+    // Blue area: revenue big, projection line, goal progress bar
+    display.setTextSize(2);
+    display.setCursor(4, 18);
+    display.print("R$" + fmtMilharBR((long)round(data.faturado)));
+
+    display.setTextSize(1);
+    String projStr = "Proj: R$" + fmtMilharBR((long)round(data.projecao));
+    if (data.meta > 0) projStr += " (" + String((int)round(data.proj_pct)) + "%)";
+    display.setCursor(4, 38);
+    display.print(projStr);
+
+    if (data.meta > 0) {
+        display.drawRect(2, 51, 124, 7, 1);
+        float pctCapped = data.pct > 100 ? 100 : (data.pct < 0 ? 0 : data.pct);
+        int fillW = (int)((pctCapped / 100.0f) * 120);
+        if (fillW > 0) display.fillRect(4, 53, fillW, 3, 1);
+        // Meta batida: moldura dupla como comemoração discreta.
+        if (data.pct >= 100) display.drawRect(0, 49, 128, 11, 1);
+    }
+}
+
 void DisplayService::drawInfoScreen(const unsigned char* image, String text) {
     display.clearDisplay();
 
@@ -1277,6 +1341,7 @@ bool DisplayService::isScreenEnabled(const AppState& state, int screenIndex) {
             }
             return true;
         }
+        case SCREEN_CELLAIRIS: return config.show_cellairis;
         default: return false;
     }
 }
@@ -1294,6 +1359,7 @@ void DisplayService::drawScreen(int screenIndex, const AppState& state, int subI
     case SCREEN_PC_MONITOR: drawPcScreen(state.pc); break;
     case SCREEN_PC_MEDIA: drawMediaScreen(state.media); break;
     case SCREEN_BAMBU: drawBambuScreen(state.bambu); break;
+    case SCREEN_CELLAIRIS: drawCellairisScreen(state.config, state.cellairis); break;
   }
 }
 

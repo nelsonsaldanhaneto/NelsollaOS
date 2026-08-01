@@ -296,6 +296,7 @@ void WebServerService::handleRoot() {
       case SCREEN_PC_MONITOR: targetId = "showPc"; break;
       case SCREEN_PC_MEDIA: targetId = "showMedia"; break;
       case SCREEN_BAMBU: targetId = "showBambu"; break;
+      case SCREEN_CELLAIRIS: targetId = "showCellairis"; break;
     }
     
     add("<li class='sortable-item' data-id='" + String(screenId) + "' data-target='" + targetId + "' draggable='true'>");
@@ -552,6 +553,31 @@ void WebServerService::handleRoot() {
               add("</div></div>");
               break;
           }
+
+          case SCREEN_CELLAIRIS: {
+              add("<div class='panel' id='panel-" + String(screenId) + "'>");
+              add("<label class='checkbox-label mt-0'><input type='checkbox' id='showCellairis' name='show_cellairis' value='1' " + String(config.show_cellairis ? "checked" : "") + "> Tela da Cellairis</label>");
+              add("<div id='cellairisContent' class='collapsible'>");
+
+              bool cellValid = state->cellairis.updated;
+              if (!cellValid) {
+                  add("<div id='cell-no-data' class='no-data-tile'>🏪 Faturamento da loja disponível após sincronizar</div><div id='cell-grid' class='hidden'>");
+              } else {
+                  add("<div id='cell-no-data' class='no-data-tile hidden'>🏪 Faturamento da loja disponível após sincronizar</div><div id='cell-grid'>");
+              }
+
+              add("<div class='dashboard-grid'>");
+              add("<div class='tile'><div class='tile-icon'>💰</div><div class='tile-value' id='cell-faturado' style='font-size:1.2rem'>R$ " + String(state->cellairis.faturado, 0) + "</div><div class='tile-label'>Faturado no Mês</div></div>");
+              add("<div class='tile'><div class='tile-icon'>📈</div><div class='tile-value' id='cell-projecao' style='font-size:1.2rem'>R$ " + String(state->cellairis.projecao, 0) + "</div><div class='tile-label'>Projeção</div></div>");
+              add("<div class='tile'><div class='tile-icon'>🎯</div><div class='tile-value' id='cell-meta' style='font-size:1.2rem'>R$ " + String(state->cellairis.meta, 0) + "</div><div class='tile-label'>Meta</div></div>");
+              add("<div class='tile'><div class='tile-icon'>✅</div><div class='tile-value' id='cell-pct' style='font-size:1.2rem'>" + String(state->cellairis.pct, 1) + "%</div><div class='tile-label'>Meta Atingida</div></div>");
+              add("</div></div>");
+
+              add("<label>Token de Acesso:</label><input type='text' name='cellairis_token' value='" + config.cellairis_token + "'>");
+              add("<p class='help-text mt-0'>Token do endpoint /api/tinytosh do gestao-cellairis. A projeção considera dias úteis (seg-sáb, sem feriados RJ).</p>");
+              add("</div></div>");
+              break;
+          }
       }
   }
 
@@ -562,7 +588,7 @@ void WebServerService::handleRoot() {
   add("let formDirty = false;");
   
   add("function updateVisibility(){");
-  add("  var pairs = [['autoDetect','manualFields',true], ['nightMode','nightFields',false], ['showTime', 'timeContent',false], ['showCalendar', 'calendarContent',false], ['showWeather','weatherContent',false], ['showDaylight','daylightContent',false], ['showPc','pcContent',false], ['showCrypto','cryptoContent',false], ['showCurrency','currencyContent',false], ['showStock','stockContent',false], ['showAQI','aqiContent',false], ['showMedia','mediaContent',false], ['showBambu','bambuContent',false]];");  
+  add("  var pairs = [['autoDetect','manualFields',true], ['nightMode','nightFields',false], ['showTime', 'timeContent',false], ['showCalendar', 'calendarContent',false], ['showWeather','weatherContent',false], ['showDaylight','daylightContent',false], ['showPc','pcContent',false], ['showCrypto','cryptoContent',false], ['showCurrency','currencyContent',false], ['showStock','stockContent',false], ['showAQI','aqiContent',false], ['showMedia','mediaContent',false], ['showBambu','bambuContent',false], ['showCellairis','cellairisContent',false]];");  
   add("  pairs.forEach(p => {");
   add("    var ch = document.getElementById(p[0]); if(!ch) return;");
   add("    var target = document.getElementById(p[1]);");
@@ -614,7 +640,7 @@ void WebServerService::handleRoot() {
   }
   add("div.innerHTML = `<div class='input-wrapper'><label class='mt-0'>Base:</label><select name='currency_bases[]'>${cOpts}</select></div><div class='input-wrapper'><label class='mt-0'>Destino:</label><select name='currency_targets[]'>${cOpts}</select></div><div class='input-wrapper'><label class='mt-0'>Mult:</label><select name='currency_multipliers[]'><option value='1'>1</option><option value='10'>10</option><option value='100'>100</option><option value='1000'>1000</option></select></div><button type='button' class='btn-remove' onclick=\"removeRow(this, 'currency-list-container')\">-</button>`; container.appendChild(div); if (bVal) div.querySelector(\"select[name='currency_bases[]']\").value = bVal; if (tVal) div.querySelector(\"select[name='currency_targets[]']\").value = tVal; if (mVal) div.querySelector(\"select[name='currency_multipliers[]']\").value = mVal; formDirty = true; updateRowControls('currency-list-container', 10); };");
 
-  add("['autoDetect', 'nightMode', 'showTime', 'showCalendar', 'showWeather', 'showDaylight', 'showPc', 'showCrypto', 'showCurrency', 'showStock', 'showAQI', 'showMedia', 'showBambu', 'autoCycle'].forEach(id => { var el=document.getElementById(id); if(el) el.addEventListener('change', updateVisibility); });");
+  add("['autoDetect', 'nightMode', 'showTime', 'showCalendar', 'showWeather', 'showDaylight', 'showPc', 'showCrypto', 'showCurrency', 'showStock', 'showAQI', 'showMedia', 'showBambu', 'showCellairis', 'autoCycle'].forEach(id => { var el=document.getElementById(id); if(el) el.addEventListener('change', updateVisibility); });");
   add("updateVisibility();");
 
   add("const countryGreetings = {");
@@ -708,7 +734,7 @@ void WebServerService::handleRoot() {
   add("  reorderPhysicalPanels(orderInput.value);");
   add("}");
 
-  add("const panelCheckboxes = ['showTime', 'showCalendar', 'showWeather', 'showAQI', 'showDaylight', 'showCrypto', 'showCurrency', 'showStock', 'showPc', 'showMedia', 'showBambu'];");
+  add("const panelCheckboxes = ['showTime', 'showCalendar', 'showWeather', 'showAQI', 'showDaylight', 'showCrypto', 'showCurrency', 'showStock', 'showPc', 'showMedia', 'showBambu', 'showCellairis'];");
   add("panelCheckboxes.forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('change', syncScreenOrder); });");
 
   add("function getDragAfterEl(y) {");
@@ -874,6 +900,8 @@ void WebServerService::handleRoot() {
   add("    setCb('showMedia', d.show_media);");
 
   add("    setCb('showBambu', d.show_bambu);");
+  add("    setCb('showCellairis', d.show_cellairis);");
+  add("    setVal('cellairis_token', d.cellairis_token);");
   add("    setVal('bambu_ip', d.bambu_ip);");
   add("    setVal('bambu_sn', d.bambu_sn);");
   add("    setVal('bambu_code', d.bambu_code);");
@@ -982,6 +1010,13 @@ void WebServerService::handleRoot() {
   add("    set('bambu-fans', 'Peça: ' + d.bambu_fan_part + ' | Aux: ' + d.bambu_fan_aux);");
   add("  } else { hide('bambu-no-data', false); hide('bambu-grid', true); }");
   
+  add("  if (d.cell_faturado !== undefined) {");
+  add("    hide('cell-no-data', true); hide('cell-grid', false);");
+  add("    set('cell-faturado', 'R$ ' + Number(d.cell_faturado).toLocaleString('pt-BR'));");
+  add("    set('cell-projecao', 'R$ ' + Number(d.cell_projecao).toLocaleString('pt-BR'));");
+  add("    set('cell-meta', 'R$ ' + Number(d.cell_meta).toLocaleString('pt-BR'));");
+  add("    set('cell-pct', d.cell_pct + '%');");
+  add("  } else { hide('cell-no-data', false); hide('cell-grid', true); }");
   add("  if (d.pc_status !== undefined) set('pc-link-status', d.pc_status);");
   add("}).catch(e => console.log('Sync error:', e)); } setInterval(updateData, 15000); updateData();");
   add("</script></div></body></html>");

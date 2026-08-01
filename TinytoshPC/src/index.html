@@ -205,6 +205,7 @@
               <li class="sortable-item" data-id="8" data-target="showPc"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Monitor do PC</li>
               <li class="sortable-item" data-id="9" data-target="showMedia"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Mídia do PC</li>
               <li class="sortable-item" data-id="10" data-target="showBambu"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Impressora 3D</li>
+              <li class="sortable-item" data-id="11" data-target="showCellairis"><div class="order-ctrl"><span class="move-btn move-up">▲</span><span class="move-btn move-down">▼</span></div>Cellairis</li>
             </ul>
             <input type="hidden" name="screen_order" id="screenOrderInput">
           </div>
@@ -406,6 +407,24 @@
                 <input type="text" name="bambu_sn" placeholder="ex: 00M...">
                 <label>Código de Acesso da Impressora:</label>
                 <input type="text" name="bambu_code" placeholder="ex: 1234abcd">
+              </div>
+            </div>
+
+            <div class="panel" id="panel-11">
+              <label class="checkbox-label mt-0"><input type="checkbox" id="showCellairis" name="show_cellairis"> Tela da Cellairis</label>
+              <div id="cellairisContent" class="collapsible">
+                <div id="cell-no-data" class="no-data-tile">🏪 Faturamento da loja disponível após sincronizar</div>
+                <div id="cell-grid" class="hidden">
+                  <div class="dashboard-grid">
+                    <div class="tile"><div class="tile-icon">💰</div><div class="tile-value" id="cell-faturado" style="font-size:1.2rem">--</div><div class="tile-label">Faturado no Mês</div></div>
+                    <div class="tile"><div class="tile-icon">📈</div><div class="tile-value" id="cell-projecao" style="font-size:1.2rem">--</div><div class="tile-label">Projeção</div></div>
+                    <div class="tile"><div class="tile-icon">🎯</div><div class="tile-value" id="cell-meta" style="font-size:1.2rem">--</div><div class="tile-label">Meta</div></div>
+                    <div class="tile"><div class="tile-icon">✅</div><div class="tile-value" id="cell-pct" style="font-size:1.2rem">--</div><div class="tile-label">Meta Atingida</div></div>
+                  </div>
+                </div>
+                <label>Token de Acesso:</label>
+                <input type="text" name="cellairis_token">
+                <p class="help-text mt-0">Token do endpoint /api/tinytosh do gestao-cellairis. Projeção por dias úteis (seg-sáb, sem feriados RJ).</p>
               </div>
             </div>
           </div> 

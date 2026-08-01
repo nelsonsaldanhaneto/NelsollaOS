@@ -19,6 +19,7 @@ enum ScreenType {
   SCREEN_PC_MONITOR,
   SCREEN_PC_MEDIA,
   SCREEN_BAMBU,
+  SCREEN_CELLAIRIS,
   NUM_SCREENS
 };
 
@@ -35,7 +36,8 @@ inline constexpr const char* SCREEN_NAMES[] = {
   "Câmbio",
   "Monitor do PC",
   "Mídia do PC",
-  "Impressora 3D"
+  "Impressora 3D",
+  "Cellairis"
 };
 
 enum AnimType {
@@ -85,7 +87,7 @@ struct Config {
   // Screens Settings
   bool screen_auto_cycle = true;
   int screen_interval_sec = 15;
-  int screen_order[NUM_SCREENS] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  int screen_order[NUM_SCREENS] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 
   bool show_time = true;
   bool show_calendar = true;
@@ -98,6 +100,7 @@ struct Config {
   bool show_pc = true;
   bool show_media = true;
   bool show_bambu = true;
+  bool show_cellairis = false;
 
   bool hide_empty_pc = true;
   bool hide_empty_media = true;
@@ -143,6 +146,9 @@ struct Config {
   String bambu_ip = "";
   String bambu_sn = "";
   String bambu_code = "";
+
+  // Cellairis (gestao-cellairis na Vercel)
+  String cellairis_token = "";
 
   // Animation Settings
   uint16_t anim_mask = 62;
@@ -193,6 +199,18 @@ struct StockData {
   float price;
   float previous_close;
   float percent_change;
+  bool updated = false;
+};
+
+// Resumo mensal da loja Cellairis, vindo do /api/tinytosh do gestao-cellairis
+// (Vercel). Projeção calculada no servidor por dias úteis (feriados RJ).
+struct CellairisData {
+  String mes;          // "2026-08"
+  float faturado = -1; // -1 = ainda sem dados
+  float projecao = 0;
+  float meta = 0;
+  float pct = 0;       // faturado / meta, em %
+  float proj_pct = 0;  // projecao / meta, em %
   bool updated = false;
 };
 
@@ -496,5 +514,6 @@ struct AppState {
   PcStats pc;
   PcMedia media;
   BambuData bambu;
+  CellairisData cellairis;
 };
 #endif
