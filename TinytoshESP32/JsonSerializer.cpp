@@ -95,7 +95,8 @@ void JsonSerializer::populateConfigDoc(const Config& config, DynamicJsonDocument
 }
 
 String JsonSerializer::buildConfigJson(const Config& config) {
-    DynamicJsonDocument doc(2048);
+    // Sized for MAX_MULTI_ENTRIES=10 across stocks/cryptos/currencies.
+    DynamicJsonDocument doc(3072);
     populateConfigDoc(config, doc);
     String output;
     serializeJson(doc, output);
@@ -103,7 +104,8 @@ String JsonSerializer::buildConfigJson(const Config& config) {
 }
 
 String JsonSerializer::buildAppStateJson(const AppState& state) {
-    DynamicJsonDocument doc(4096);
+    // Sized for MAX_MULTI_ENTRIES=10: each tracked item adds ~90 bytes of live data.
+    DynamicJsonDocument doc(6144);
     
     // 1. Unload all config variables
     populateConfigDoc(state.config, doc);
@@ -208,7 +210,7 @@ String JsonSerializer::buildAppStateJson(const AppState& state) {
 }
 
 bool JsonSerializer::parseConfig(const char* jsonString, AppState& state) {
-    DynamicJsonDocument doc(3072);
+    DynamicJsonDocument doc(4096);
     DeserializationError error = deserializeJson(doc, jsonString);
     if (error) return false;
 

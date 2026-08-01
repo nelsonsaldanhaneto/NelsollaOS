@@ -3,7 +3,9 @@
 
 #include <Arduino.h>
 
-const int MAX_MULTI_ENTRIES = 5;
+// Raised from 5 so a real portfolio fits (Nelson's has 9 B3 tickers). The
+// web panel and PC app row limits must match — both check against 10 too.
+const int MAX_MULTI_ENTRIES = 10;
 
 enum ScreenType {
   SCREEN_TIME,
@@ -338,6 +340,8 @@ inline constexpr StockOption topStocks[] = {
   {"Embraer ON", "EMBR3.SA"}, {"Cemig PN", "CMIG4.SA"}, {"Taesa Units", "TAEE11.SA"},
   {"Klabin Units", "KLBN11.SA"}, {"Hapvida ON", "HAPV3.SA"}, {"Vivo ON", "VIVT3.SA"},
   {"Engie Brasil ON", "EGIE3.SA"}, {"Copel PNB", "CPLE6.SA"}, {"Sabesp ON", "SBSP3.SA"},
+  {"MBRF (Marfrig) ON", "MBRF3.SA"}, {"Bemobi ON", "BMOB3.SA"}, {"It Now IDIV ETF", "DIVO11.SA"},
+  {"BTG Teva AUVP ETF", "AUVP11.SA"}, {"Nasdaq-100 BRL ETF", "NASD11.SA"}, {"Hashdex Cripto ETF", "HASH11.SA"},
 
   // Broad Market & Sector ETFs
   {"S&P 500 ETF", "SPY"}, {"Invesco QQQ (Tech)", "QQQ"}, {"Dow Jones ETF", "DIA"},

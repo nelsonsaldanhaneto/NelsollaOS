@@ -1056,36 +1056,36 @@ window.updateRowControls = function(containerId, maxLimit) {
 window.removeRow = function(btn, containerId) {
     btn.parentElement.remove();
     formDirty = true;
-    updateRowControls(containerId, 5);
+    updateRowControls(containerId, 10);
 };
 
 window.addStockRow = function(val = null) {
     const container = document.getElementById("stock-list-container");
-    if (!container || container.children.length >= 5) return;
+    if (!container || container.children.length >= 10) return;
     const div = document.createElement("div"); div.className = "multi-row";
     let opts = topStocks.map(s => `<option value="${s[1]}">${s[0]} - ${s[1]}</option>`).join('');
     div.innerHTML = `<div class="input-wrapper"><label class="mt-0">Ação / ETF:</label><select name="stock_symbols[]">${opts}</select></div><button type="button" class="btn-remove" onclick="removeRow(this, 'stock-list-container')">-</button>`;
     container.appendChild(div);
     if (val) div.querySelector("select").value = val;
     formDirty = true;
-    updateRowControls('stock-list-container', 5);
+    updateRowControls('stock-list-container', 10);
 };
 
 window.addCryptoRow = function(val = null) {
     const container = document.getElementById("crypto-list-container");
-    if (!container || container.children.length >= 5) return;
+    if (!container || container.children.length >= 10) return;
     const div = document.createElement("div"); div.className = "multi-row";
     let opts = topCoins.map(c => `<option value="${c[0]}">${c[1]}</option>`).join('');
     div.innerHTML = `<div class="input-wrapper"><label class="mt-0">Cripto:</label><select name="crypto_ids[]">${opts}</select></div><button type="button" class="btn-remove" onclick="removeRow(this, 'crypto-list-container')">-</button>`;
     container.appendChild(div);
     if (val) div.querySelector("select").value = val;
     formDirty = true;
-    updateRowControls('crypto-list-container', 5);
+    updateRowControls('crypto-list-container', 10);
 };
 
 window.addCurrencyRow = function(bVal = null, tVal = null, mVal = null) {
     const container = document.getElementById("currency-list-container");
-    if (!container || container.children.length >= 5) return;
+    if (!container || container.children.length >= 10) return;
     const div = document.createElement("div"); div.className = "multi-row";
     let cOpts = allCurrencies.map(c => `<option value="${c[0]}">${c[0].toUpperCase()}</option>`).join('');
     div.innerHTML = `
@@ -1098,7 +1098,7 @@ window.addCurrencyRow = function(bVal = null, tVal = null, mVal = null) {
     if (tVal) div.querySelector("select[name='currency_targets[]']").value = tVal;
     if (mVal) div.querySelector("select[name='currency_multipliers[]']").value = mVal;
     formDirty = true;
-    updateRowControls('currency-list-container', 5);
+    updateRowControls('currency-list-container', 10);
 };
 
 window.addEventListener("DOMContentLoaded", () => {
