@@ -1256,16 +1256,25 @@ void DisplayService::drawCellairisScreen(const Config& config, const CellairisDa
     display.setTextSize(1);
     String projStr = "Proj: R$" + fmtMilharBR((long)round(data.projecao));
     if (data.meta > 0) projStr += " (" + String((int)round(data.proj_pct)) + "%)";
-    display.setCursor(4, 38);
+    display.setCursor(4, 37);
     display.print(projStr);
 
     if (data.meta > 0) {
-        display.drawRect(2, 51, 124, 7, 1);
+        // A realidade, sem ambiguidade: quanto falta de fato para a meta.
+        long falta = (long)round(data.meta - data.faturado);
+        String faltaStr = (falta > 0)
+            ? "Falta: R$" + fmtMilharBR(falta)
+            : "Meta batida! +R$" + fmtMilharBR(-falta);
+        display.setCursor(4, 47);
+        display.print(faltaStr);
+
+        // Barra = faturado acumulado / meta (nao projecao).
+        display.drawRect(2, 57, 124, 6, 1);
         float pctCapped = data.pct > 100 ? 100 : (data.pct < 0 ? 0 : data.pct);
         int fillW = (int)((pctCapped / 100.0f) * 120);
-        if (fillW > 0) display.fillRect(4, 53, fillW, 3, 1);
+        if (fillW > 0) display.fillRect(4, 59, fillW, 2, 1);
         // Meta batida: moldura dupla como comemoração discreta.
-        if (data.pct >= 100) display.drawRect(0, 49, 128, 11, 1);
+        if (data.pct >= 100) display.drawRect(0, 55, 128, 9, 1);
     }
 }
 
