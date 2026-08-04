@@ -19,6 +19,7 @@
 #include "PcMonitorService.h"
 #include "BambuService.h"
 #include "CellairisService.h"
+#include "GameService.h"
 
 // Global Constants
 const char* AP_SSID = "NelsollaOS";
@@ -66,6 +67,7 @@ StockService stockService;
 PcMonitorService pcMonitorService;
 BambuService bambuService;
 CellairisService cellairisService;
+GameService gameService;
 
 unsigned long lastScreenSwitch = 0;
 int currentScreen = 0;
@@ -210,12 +212,23 @@ void validatePins(Config& config) {
   claimPin(config.touch_pin, DEFAULT_TOUCH_PIN);
 }
 
+// 5 toques rapidos em qualquer tela abrem o NELSOLLA RUN (easter egg).
+void handleMultiClick() {
+  if (button.getNumberClicks() >= 5) {
+    gameService.start();
+  } else {
+    // 2-4 toques: trata como toques de troca de tela que chegaram rapido demais
+    handleSingleClick();
+  }
+}
+
 void configureHardware() {
   validatePins(appState.config);
   
   button.setup(appState.config.touch_pin, INPUT, false);
   button.attachClick(handleSingleClick);
   button.attachLongPressStart(handleLongPress);
+  button.attachMultiClick(handleMultiClick);
   button.setDebounceTicks(50); 
   button.setClickTicks(100);
   button.setPressTicks(750);
@@ -417,6 +430,7 @@ void setup() {
 
   displayService.showOLEDStatus({"\n", "\n", "Iniciando...", "\n", "\n", "Config Carregada!"}, true);
   bambuService.begin(&appState.config, &appState.bambu);
+  gameService.begin(&displayService.display, appState.config.touch_pin);
 
   WiFiManager wm;
   wm.setConnectTimeout(15);
@@ -467,6 +481,23 @@ void setup() {
 
 void loop() {
   webServerService.handleClient();
+
+  // Modo jogo: o GameService le o botao direto (sem debounce do OneButton,
+  // que atrasaria o pulo). Ao sair, reseta o OneButton pra nao disparar um
+  // clique fantasma com o estado que ficou pela metade.
+  static bool wasGameActive = false;
+  if (gameService.isActive()) {
+    wasGameActive = true;
+    gameService.update();
+    return;
+  }
+  if (wasGameActive) {
+    wasGameActive = false;
+    button.reset();
+    lastScreenUpdate = 0;   // forca redesenho da tela normal
+    lastScreenSwitch = millis();
+  }
+
   bambuService.loop();
   button.tick();
 
