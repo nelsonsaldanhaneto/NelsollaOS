@@ -89,20 +89,23 @@ void drawCurrentScreen() {
   displayService.drawScreen(currentScreen, appState, currentSubScreen);
 }
 
-void switchToNextScreen() {
+// animate=false troca instantaneamente. As animacoes sao loops bloqueantes de
+// ~300-600ms (frames I2C + delay) em que button.tick() nao roda, entao toques
+// rapidos seguidos eram engolidos — justamente o caso do easter egg.
+void switchToNextScreen(bool animate = true) {
   if (currentScreen == SCREEN_STOCK && currentSubScreen + 1 < appState.config.stock_count) {
       currentSubScreen++;
-      displayService.animateTransition(currentScreen, currentSubScreen - 1, currentScreen, currentSubScreen, appState);
+      if (animate) displayService.animateTransition(currentScreen, currentSubScreen - 1, currentScreen, currentSubScreen, appState);
       return;
   }
   if (currentScreen == SCREEN_CRYPTO && currentSubScreen + 1 < appState.config.crypto_count) {
       currentSubScreen++;
-      displayService.animateTransition(currentScreen, currentSubScreen - 1, currentScreen, currentSubScreen, appState);
+      if (animate) displayService.animateTransition(currentScreen, currentSubScreen - 1, currentScreen, currentSubScreen, appState);
       return;
   }
   if (currentScreen == SCREEN_CURRENCY && currentSubScreen + 1 < appState.config.currency_count) {
       currentSubScreen++;
-      displayService.animateTransition(currentScreen, currentSubScreen - 1, currentScreen, currentSubScreen, appState);
+      if (animate) displayService.animateTransition(currentScreen, currentSubScreen - 1, currentScreen, currentSubScreen, appState);
       return;
   }
 
@@ -131,7 +134,7 @@ void switchToNextScreen() {
 
   if (oldScreen == nextScreenCandidate && oldSubScreen == 0) return;
 
-  displayService.animateTransition(oldScreen, oldSubScreen, nextScreenCandidate, 0, appState);
+  if (animate) displayService.animateTransition(oldScreen, oldSubScreen, nextScreenCandidate, 0, appState);
   currentScreen = nextScreenCandidate;
 }
 
@@ -212,16 +215,6 @@ void validatePins(Config& config) {
   claimPin(config.touch_pin, DEFAULT_TOUCH_PIN);
 }
 
-// 5 toques rapidos em qualquer tela abrem o NELSOLLA RUN (easter egg).
-void handleMultiClick() {
-  if (button.getNumberClicks() >= 5) {
-    gameService.start();
-  } else {
-    // 2-4 toques: trata como toques de troca de tela que chegaram rapido demais
-    handleSingleClick();
-  }
-}
-
 void configureHardware() {
   validatePins(appState.config);
   
@@ -229,7 +222,8 @@ void configureHardware() {
   button.attachClick(handleSingleClick);
   button.attachLongPressStart(handleLongPress);
   button.attachMultiClick(handleMultiClick);
-  button.setDebounceTicks(50); 
+  // O TTP223 ja debounce em hardware; 50ms aqui engolia toques rapidos.
+  button.setDebounceTicks(25); 
   button.setClickTicks(100);
   button.setPressTicks(750);
   button.reset();
@@ -239,7 +233,44 @@ void configureHardware() {
 
 // Core Application Logic
 
-void handleSingleClick() {
+// Easter egg: NELSOLLA RUN abre com 5 toques. O multiclick do OneButton exige
+// que todos caibam em janelas consecutivas de 100ms, o que quase nunca acontece
+// na pratica — entao contamos por conta propria numa janela rolante, somando
+// qualquer combinacao de cliques simples e multiplos.
+const int GAME_TAP_COUNT = 5;
+const unsigned long GAME_TAP_WINDOW_MS = 3000;
+unsigned long recentTaps[GAME_TAP_COUNT] = {0};
+int recentTapIndex = 0;
+
+bool registerTaps(int count) {
+  unsigned long now = millis();
+  for (int i = 0; i < count; i++) {
+    recentTaps[recentTapIndex] = now;
+    recentTapIndex = (recentTapIndex + 1) % GAME_TAP_COUNT;
+  }
+
+  int naJanela = 0;
+  for (int i = 0; i < GAME_TAP_COUNT; i++)
+    if (recentTaps[i] != 0 && now - recentTaps[i] <= GAME_TAP_WINDOW_MS) naJanela++;
+  Serial.printf("👆 toque (%d/%d na janela)\n", naJanela, GAME_TAP_COUNT);
+
+  // Depois de avancar, o slot atual guarda o mais antigo dos ultimos 5 toques.
+  unsigned long oldest = recentTaps[recentTapIndex];
+  if (oldest == 0 || now - oldest > GAME_TAP_WINDOW_MS) return false;
+
+  for (int i = 0; i < GAME_TAP_COUNT; i++) recentTaps[i] = 0;  // exige 5 novos
+  Serial.println("GameService: sequencia de 5 toques detectada!");
+  gameService.start();
+  return true;
+}
+
+void doClickAction() {
+  // Toque logo apos o anterior = usuario tamborilando (provavelmente atras do
+  // easter egg). Pula a animacao pra nao bloquear a leitura dos proximos.
+  static unsigned long lastClickAt = 0;
+  bool rapid = (millis() - lastClickAt) < 600;
+  lastClickAt = millis();
+
   int activeAction = getActiveNightAction();
   bool wasScreenOff = (nightModeLatched && activeAction == 2 && (millis() - lastInteractionTime >= NIGHT_WAKE_DURATION_MS));
 
@@ -255,12 +286,24 @@ void handleSingleClick() {
       displayService.display.ssd1306_command(SSD1306_SETCONTRAST);
       displayService.display.ssd1306_command((activeAction == 0) ? CONTRAST_MAX : CONTRAST_DIM);
     }
-    switchToNextScreen();
+    switchToNextScreen(!rapid);
   }
   
   lastScreenSwitch = millis();
   lastInteractionTime = millis();
   lastScreenUpdate = 0;
+}
+
+void handleSingleClick() {
+  if (registerTaps(1)) return;
+  doClickAction();
+}
+
+void handleMultiClick() {
+  int n = button.getNumberClicks();
+  Serial.printf("👆 %d toques seguidos\n", n);
+  if (registerTaps(n)) return;
+  doClickAction();
 }
 
 void handleLongPress() {
