@@ -1278,6 +1278,37 @@ void DisplayService::drawCellairisScreen(const Config& config, const CellairisDa
     }
 }
 
+// Feedback do gesto clique+segurar que abre o jogo. Sem isso o usuario segura
+// no escuro sem saber se o gesto pegou — e solta antes da hora.
+void DisplayService::drawGameHoldProgress(int pct) {
+    if (pct < 0) pct = 0;
+    if (pct > 100) pct = 100;
+
+    display.clearDisplay();
+    display.setTextColor(SSD1306_WHITE);
+    display.setTextWrap(false);
+    display.setFont();
+    display.setTextSize(1);
+
+    int16_t x1, y1; uint16_t w, h;
+    const char* title = "NELSOLLA RUN";
+    display.getTextBounds(title, 0, 0, &x1, &y1, &w, &h);
+    display.setCursor((128 - w) / 2, 3);
+    display.print(title);
+    display.drawFastHLine(0, 13, 128, SSD1306_WHITE);
+
+    const char* hint = "Segure para jogar";
+    display.getTextBounds(hint, 0, 0, &x1, &y1, &w, &h);
+    display.setCursor((128 - w) / 2, 26);
+    display.print(hint);
+
+    display.drawRect(12, 42, 104, 12, SSD1306_WHITE);
+    int fill = (100 * pct) / 100;
+    if (fill > 0) display.fillRect(14, 44, fill, 8, SSD1306_WHITE);
+
+    display.display();
+}
+
 void DisplayService::drawInfoScreen(const unsigned char* image, String text) {
     display.clearDisplay();
 

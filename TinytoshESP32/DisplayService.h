@@ -26,6 +26,7 @@ public:
     void drawMediaScreen(const PcMedia& media);
     void drawBambuScreen(const BambuData& bambu);
     void drawCellairisScreen(const Config& config, const CellairisData& data);
+    void drawGameHoldProgress(int pct);
     void drawInfoScreen(const unsigned char* image = nullptr, String text = "Sem Dados");
 
     void drawScreen(int screenIndex, const AppState& state, int subIndex = 0);

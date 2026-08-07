@@ -220,12 +220,15 @@ void configureHardware() {
   
   button.setup(appState.config.touch_pin, INPUT, false);
   button.attachClick(handleSingleClick);
-  button.attachLongPressStart(handleLongPress);
+  button.attachLongPressStart(handleLongPressStart);
+  button.attachDuringLongPress(handleDuringLongPress);
+  button.attachLongPressStop(handleLongPressStop);
   button.attachMultiClick(handleMultiClick);
   // O TTP223 ja debounce em hardware; 50ms aqui engolia toques rapidos.
   button.setDebounceTicks(25); 
   button.setClickTicks(100);
   button.setPressTicks(750);
+  button.setLongPressIntervalMs(60);   // cadencia da barra de progresso do gesto
   button.reset();
   
   Serial.printf("Hardware Configured: SDA=%d, SCL=%d, TOUCH=%d\n", appState.config.sda_pin, appState.config.scl_pin, appState.config.touch_pin);
@@ -233,36 +236,14 @@ void configureHardware() {
 
 // Core Application Logic
 
-// Easter egg: NELSOLLA RUN abre com 5 toques. O multiclick do OneButton exige
-// que todos caibam em janelas consecutivas de 100ms, o que quase nunca acontece
-// na pratica — entao contamos por conta propria numa janela rolante, somando
-// qualquer combinacao de cliques simples e multiplos.
-const int GAME_TAP_COUNT = 5;
-const unsigned long GAME_TAP_WINDOW_MS = 3000;
-unsigned long recentTaps[GAME_TAP_COUNT] = {0};
-int recentTapIndex = 0;
-
-bool registerTaps(int count) {
-  unsigned long now = millis();
-  for (int i = 0; i < count; i++) {
-    recentTaps[recentTapIndex] = now;
-    recentTapIndex = (recentTapIndex + 1) % GAME_TAP_COUNT;
-  }
-
-  int naJanela = 0;
-  for (int i = 0; i < GAME_TAP_COUNT; i++)
-    if (recentTaps[i] != 0 && now - recentTaps[i] <= GAME_TAP_WINDOW_MS) naJanela++;
-  Serial.printf("👆 toque (%d/%d na janela)\n", naJanela, GAME_TAP_COUNT);
-
-  // Depois de avancar, o slot atual guarda o mais antigo dos ultimos 5 toques.
-  unsigned long oldest = recentTaps[recentTapIndex];
-  if (oldest == 0 || now - oldest > GAME_TAP_WINDOW_MS) return false;
-
-  for (int i = 0; i < GAME_TAP_COUNT; i++) recentTaps[i] = 0;  // exige 5 novos
-  Serial.println("GameService: sequencia de 5 toques detectada!");
-  gameService.start();
-  return true;
-}
+// Easter egg: NELSOLLA RUN abre com um clique seguido de segurar 3s.
+//
+// O discriminador vem da propria maquina de estados do OneButton: ao voltar de
+// OCS_COUNT para OCS_DOWN ela NAO zera _nClicks, entao no longPressStart
+// getNumberClicks() vale 0 num hold puro (= travar rotacao, comportamento de
+// sempre) e >=1 quando um clique precedeu o hold (= gesto do jogo).
+const unsigned long GAME_HOLD_MS = 3000;
+bool gameGestureArmed = false;
 
 void doClickAction() {
   // Toque logo apos o anterior = usuario tamborilando (provavelmente atras do
@@ -295,18 +276,45 @@ void doClickAction() {
 }
 
 void handleSingleClick() {
-  if (registerTaps(1)) return;
   doClickAction();
 }
 
 void handleMultiClick() {
-  int n = button.getNumberClicks();
-  Serial.printf("👆 %d toques seguidos\n", n);
-  if (registerTaps(n)) return;
+  // 2+ toques rapidos: mantem o avanco de tela, senao tamborilar nao faria nada.
   doClickAction();
 }
 
-void handleLongPress() {
+void handleLongPressStart() {
+  if (button.getNumberClicks() >= 1) {
+    gameGestureArmed = true;
+    Serial.println("GameService: gesto do jogo armado (clique + segurar)...");
+    displayService.drawGameHoldProgress(0);
+    return;
+  }
+  toggleAutoCycle();
+}
+
+void handleDuringLongPress() {
+  if (!gameGestureArmed) return;
+
+  unsigned long held = button.getPressedMs();
+  if (held >= GAME_HOLD_MS) {
+    gameGestureArmed = false;
+    gameService.start();
+    return;
+  }
+  displayService.drawGameHoldProgress((int)((held * 100) / GAME_HOLD_MS));
+}
+
+void handleLongPressStop() {
+  if (!gameGestureArmed) return;
+  // Soltou antes dos 3s: aborta sem efeito e devolve a tela normal.
+  gameGestureArmed = false;
+  Serial.println("GameService: gesto abortado.");
+  lastScreenUpdate = 0;
+}
+
+void toggleAutoCycle() {
   appState.config.screen_auto_cycle = !appState.config.screen_auto_cycle;
 
   if (appState.config.screen_auto_cycle) {
@@ -453,7 +461,8 @@ void backgroundDataFetchTask(void* parameter) {
     for (int i = 0; i < appState.config.stock_count; i++) stockService.fetchStock(appState.config.stock_symbols[i], appState.stocks[i]);
   }
   if (appState.config.show_calendar && appState.config.calendar_show_holidays && appState.calendar.last_fetch_year != current_year) calendarService.fetchHolidays(appState.config.country_code, appState.calendar);
-  
+  if (appState.config.show_cellairis) cellairisService.fetchSummary(appState.config, appState.cellairis);
+
   Serial.println("Background Task: Updates complete.");
   isBackgroundUpdating = false;
   bgUpdateTaskHandle = NULL;

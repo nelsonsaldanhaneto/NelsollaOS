@@ -27,8 +27,12 @@ void GameService::saveHiscore() {
 void GameService::start() {
     active = true;
     phase = PHASE_START;
-    prevTouch = true;           // o 5o toque da ativacao ainda pode estar pressionado
-    exitConsumedTouch = false;
+    // O gesto de ativacao (clique + segurar 3s) termina com o botao AINDA
+    // pressionado. Marcar esse toque como ja consumido evita que ele seja lido
+    // como "segurar para sair" e feche o jogo no mesmo instante em que abre.
+    prevTouch = true;
+    exitConsumedTouch = true;
+    touchStart = millis();
     lastTick = 0;
     Serial.println("GameService: NELSOLLA RUN ativado!");
     render();
